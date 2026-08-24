@@ -10,7 +10,9 @@ import {
   Calendar,
   User,
   Megaphone,
-  RefreshCw
+  RefreshCw,
+  BellRing,
+  Sparkles
 } from 'lucide-react';
 
 export const Notices = () => {
@@ -25,7 +27,8 @@ export const Notices = () => {
     setLoading(true);
     try {
       const res = await api.get('/notices');
-      setNotices(res.data?.notices || []);
+      const items = Array.isArray(res.data) ? res.data : (res.data?.notices || res.data?.items || []);
+      setNotices(items);
     } catch (err) {
       console.error('Failed to load notices', err);
     } finally {
@@ -50,157 +53,138 @@ export const Notices = () => {
     }
   };
 
-  const pinnedNotices = notices.filter((n) => n.isPinned);
-  const regularNotices = notices.filter((n) => !n.isPinned);
+  const pinnedNotices = notices.filter((n) => n.isPinned || n.priority === 'Urgent');
+  const regularNotices = notices.filter((n) => !n.isPinned && n.priority !== 'Urgent');
 
   return (
-    <div className="space-y-6 pb-12">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6 pb-16 font-sans text-slate-100">
+      {/* Header Card */}
+      <div className="p-6 bg-[#0B1220]/90 border border-slate-800 rounded-3xl backdrop-blur-xl shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-            <Megaphone className="w-6 h-6 text-blue-600" />
-            Society Announcements & Bulletins
-          </h2>
-          <p className="text-xs text-slate-500 mt-1">
-            Official operational circulars, AGM updates, maintenance advisories, and facility notices
+          <div className="flex items-center gap-2.5">
+            <BellRing className="w-5 h-5 text-cyan-400" />
+            <h2 className="text-lg font-bold font-sans text-white uppercase tracking-tight">
+              Society Bulletins & Official Circulars
+            </h2>
+          </div>
+          <p className="text-xs text-slate-400 mt-1">
+            General management broadcasts, water shutoff notices, and AGM announcements.
           </p>
         </div>
 
         {isManagerOrStaff && (
           <button
             onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-500/20 transition-all self-start sm:self-auto"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl transition-all self-start sm:self-auto cursor-pointer shadow-[0_0_15px_rgba(37,99,235,0.4)]"
           >
-            <Plus className="w-4 h-4" />
-            <span>Publish Notice</span>
+            <Plus className="w-4 h-4 text-white" />
+            <span>Post New Circular</span>
           </button>
         )}
       </div>
 
-      {loading ? (
-        <div className="p-12 flex items-center justify-center text-slate-400">
-          <RefreshCw className="w-5 h-5 animate-spin text-blue-600 mr-2" />
-          Loading announcements...
-        </div>
-      ) : notices.length === 0 ? (
-        <div className="p-12 bg-white border border-slate-200/80 rounded-2xl text-center text-xs text-slate-400">
-          No notices currently active on the community board.
-        </div>
-      ) : (
-        <div className="space-y-6">
-          {/* Pinned Section */}
-          {pinnedNotices.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-xs font-extrabold text-amber-700 uppercase tracking-wider flex items-center gap-1.5">
-                <Pin className="w-3.5 h-3.5 text-amber-600" />
-                Pinned Priority Announcements ({pinnedNotices.length})
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {pinnedNotices.map((notice) => (
-                  <div
-                    key={notice._id}
-                    className="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-5 shadow-card flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-start justify-between gap-3 mb-2.5">
-                        <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-200/80 text-amber-900 font-extrabold">
-                          {notice.category}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <span className="flex items-center gap-1 text-[11px] text-slate-500 font-mono">
-                            <Calendar className="w-3 h-3" />
-                            {new Date(notice.createdAt).toLocaleDateString()}
-                          </span>
-                          {isAdmin && (
-                            <button
-                              onClick={() => handleDelete(notice._id)}
-                              className="text-slate-400 hover:text-rose-600 p-1 transition-colors"
-                              title="Delete Notice"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                        </div>
-                      </div>
+      {/* Pinned Important Announcements */}
+      {pinnedNotices.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+            <Pin className="w-3.5 h-3.5 fill-amber-400" />
+            <span>PINNED IMPORTANT NOTICES</span>
+          </h3>
 
-                      <h4 className="text-sm font-bold text-slate-900 mb-1.5 leading-snug">
-                        {notice.title}
-                      </h4>
-                      <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap font-medium">
-                        {notice.content}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-amber-200/60 flex items-center gap-2 text-[11px] text-slate-500 font-medium">
-                      <User className="w-3 h-3 text-slate-400" />
-                      <span>Issued by: {notice.createdBy?.name || 'Society Ops'}</span>
-                    </div>
+          <div className="space-y-3">
+            {pinnedNotices.map((n) => (
+              <div
+                key={n._id}
+                className="p-5 bg-gradient-to-r from-amber-950/80 to-slate-900/90 border border-amber-500/50 rounded-2xl shadow-[0_0_20px_rgba(245,158,11,0.15)] space-y-2 relative"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-400 text-slate-950">
+                      HIGH PRIORITY
+                    </span>
+                    <h4 className="text-sm font-bold text-white">{n.title}</h4>
                   </div>
-                ))}
+
+                  <span className="text-[11px] font-mono text-slate-400">
+                    {new Date(n.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+
+                <p className="text-xs text-slate-200 leading-relaxed">{n.content}</p>
+
+                <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-2 border-t border-amber-500/20">
+                  <span>Issued by: <strong className="text-slate-200">{n.issuedBy?.name || 'Secretary Elena Vance'}</strong></span>
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDelete(n._id)}
+                      className="text-rose-400 hover:text-rose-300 transition-colors"
+                    >
+                      Delete Notice
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-
-          {/* Regular Announcements */}
-          {regularNotices.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">
-                General Community Notices
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {regularNotices.map((notice) => (
-                  <div
-                    key={notice._id}
-                    className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-card hover:shadow-card-hover transition-all flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-start justify-between gap-3 mb-2.5">
-                        <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold">
-                          {notice.category}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <span className="flex items-center gap-1 text-[11px] text-slate-400 font-mono">
-                            <Calendar className="w-3 h-3" />
-                            {new Date(notice.createdAt).toLocaleDateString()}
-                          </span>
-                          {isAdmin && (
-                            <button
-                              onClick={() => handleDelete(notice._id)}
-                              className="text-slate-400 hover:text-rose-600 p-1 transition-colors"
-                              title="Delete Notice"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                        </div>
-                      </div>
-
-                      <h4 className="text-sm font-bold text-slate-900 mb-1.5 leading-snug">
-                        {notice.title}
-                      </h4>
-                      <p className="text-xs text-slate-600 leading-relaxed whitespace-pre-wrap font-medium">
-                        {notice.content}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2 text-[11px] text-slate-400 font-medium">
-                      <User className="w-3 h-3 text-slate-400" />
-                      <span>Issued by: {notice.createdBy?.name || 'Society Ops'}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+            ))}
+          </div>
         </div>
       )}
 
-      <CreateNoticeModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onCreated={fetchNotices}
-      />
+      {/* Regular Circulars */}
+      <div className="space-y-3">
+        <h3 className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
+          GENERAL NOTICES ({regularNotices.length})
+        </h3>
+
+        {loading ? (
+          <div className="p-12 text-center text-slate-400 bg-slate-950/60 rounded-2xl border border-slate-800">
+            <RefreshCw className="w-6 h-6 animate-spin text-cyan-400 mx-auto mb-2" />
+            Loading circulars...
+          </div>
+        ) : regularNotices.length === 0 && pinnedNotices.length === 0 ? (
+          <div className="p-12 text-center text-slate-400 bg-slate-950/60 rounded-2xl border border-slate-800">
+            No circulars currently posted.
+          </div>
+        ) : (
+          regularNotices.map((n) => (
+            <div
+              key={n._id}
+              className="p-5 bg-[#0B1220]/90 border border-slate-800 rounded-2xl space-y-2 shadow-md hover:border-slate-700 transition-colors"
+            >
+              <div className="flex items-center justify-between">
+                <h4 className="text-sm font-bold text-white">{n.title}</h4>
+                <span className="text-[11px] font-mono text-slate-500">
+                  {new Date(n.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+
+              <p className="text-xs text-slate-300 leading-relaxed">{n.content}</p>
+
+              <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 pt-2 border-t border-slate-800">
+                <span>Issued by: <strong className="text-slate-300">{n.issuedBy?.name || 'Secretary Elena Vance'}</strong></span>
+                {isAdmin && (
+                  <button
+                    onClick={() => handleDelete(n._id)}
+                    className="text-rose-400 hover:text-rose-300 transition-colors"
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {isCreateModalOpen && (
+        <CreateNoticeModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onCreated={() => {
+            setIsCreateModalOpen(false);
+            fetchNotices();
+          }}
+        />
+      )}
     </div>
   );
 };

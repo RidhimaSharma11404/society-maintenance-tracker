@@ -5,29 +5,34 @@ import {
   Search,
   Plus,
   Bot,
-  LogOut
+  LogOut,
+  Shield,
+  Wrench,
+  Home,
+  Sparkles
 } from 'lucide-react';
 
 export const Navbar = ({ onOpenAssistant, onOpenCreateTicket, searchQuery, setSearchQuery, onNavigateTab, onLogout, onGoToLogin }) => {
   const { user, logout, switchDemoRole } = useAuth();
 
   return (
-    <header className="h-16 border-b border-slate-200 bg-white sticky top-0 z-40 px-4 sm:px-6 flex items-center justify-between">
+    <header className="h-16 border-b border-slate-800/80 bg-[#0A101D]/90 backdrop-blur-xl sticky top-0 z-40 px-4 sm:px-6 flex items-center justify-between text-slate-100 shadow-lg">
       {/* Brand */}
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-[#16233D] flex items-center justify-center text-white font-mono font-bold text-xs tracking-wider">
+        <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 via-cyan-500 to-teal-400 flex items-center justify-center text-white font-mono font-bold text-xs tracking-wider shadow-[0_0_16px_rgba(6,182,212,0.45)]">
           GH
         </div>
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-sm font-bold text-slate-900 tracking-tight font-sans">
+            <h1 className="text-sm font-bold text-white tracking-tight font-sans">
               Greenwood Heights
             </h1>
-            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 border border-[#CBD3DD] text-[#16233D] bg-[#F7F9FB]">
-              Operations Console
+            <span className="inline-flex items-center gap-1 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full border border-emerald-500/30 text-emerald-400 bg-emerald-950/50">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Live
             </span>
           </div>
-          <p className="text-xs text-slate-500 font-sans hidden sm:block">
+          <p className="text-[11px] text-slate-400 font-sans hidden sm:block">
             Facility Maintenance & Risk Management System
           </p>
         </div>
@@ -42,7 +47,7 @@ export const Navbar = ({ onOpenAssistant, onOpenCreateTicket, searchQuery, setSe
             placeholder="Search complaints, flat / unit (e.g. Tower B - 101), or categories..."
             value={searchQuery || ''}
             onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white transition-all"
+            className="w-full pl-9 pr-3 py-1.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all"
           />
         </div>
       </div>
@@ -52,40 +57,47 @@ export const Navbar = ({ onOpenAssistant, onOpenCreateTicket, searchQuery, setSe
         {/* Quick New Request Button */}
         <button
           onClick={onOpenCreateTicket}
-          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 transition-colors cursor-pointer shadow-xs"
+          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-xl text-xs font-semibold text-slate-200 hover:text-white transition-all cursor-pointer shadow-sm"
         >
-          <Plus className="w-3.5 h-3.5 text-slate-500" />
+          <Plus className="w-3.5 h-3.5 text-cyan-400" />
           <span>New Request</span>
         </button>
 
         {/* Quick AI Help */}
         <button
           onClick={onOpenAssistant}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-950/50 hover:bg-cyan-900/50 border border-cyan-500/30 rounded-xl text-cyan-300 text-xs font-semibold transition-all cursor-pointer shadow-[0_0_12px_rgba(6,182,212,0.15)]"
         >
-          <Bot className="w-3.5 h-3.5 text-blue-600" />
+          <Bot className="w-3.5 h-3.5 text-cyan-400" />
           <span className="hidden md:inline">AI Help Desk</span>
         </button>
 
-        {/* Segmented Role Switcher */}
-        <div className="hidden lg:flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs">
-          <span className="text-[11px] font-medium text-slate-500 px-2 select-none">
-            Role:
+        {/* CareSync-style DEMO ROLE SWITCHER PILL BAR */}
+        <div className="hidden lg:flex items-center bg-slate-950/80 p-1 rounded-xl border border-slate-800 text-xs gap-1">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 px-2 select-none flex items-center gap-1">
+            <Sparkles className="w-3 h-3 text-cyan-400" />
+            <span>DEMO:</span>
           </span>
-          <div className="flex items-center gap-0.5">
-            {['admin', 'staff', 'resident'].map((r) => {
-              const isActive = user?.role === r;
+          <div className="flex items-center gap-1">
+            {[
+              { id: 'admin', label: 'Admin', icon: Shield },
+              { id: 'staff', label: 'Staff', icon: Wrench },
+              { id: 'resident', label: 'Resident', icon: Home }
+            ].map((item) => {
+              const Icon = item.icon;
+              const isActive = user?.role === item.id;
               return (
                 <button
-                  key={r}
-                  onClick={() => switchDemoRole(r)}
-                  className={`px-2.5 py-0.5 rounded-md text-xs capitalize font-semibold transition-all cursor-pointer ${
+                  key={item.id}
+                  onClick={() => switchDemoRole(item.id)}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-white text-slate-900 shadow-xs'
-                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/60'
+                      ? 'bg-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.5)] border border-blue-400/40 font-bold'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
                   }`}
                 >
-                  {r}
+                  <Icon className="w-3 h-3" />
+                  <span>{item.label}</span>
                 </button>
               );
             })}
@@ -93,21 +105,21 @@ export const Navbar = ({ onOpenAssistant, onOpenCreateTicket, searchQuery, setSe
         </div>
 
         {/* User Identity Profile */}
-        <div className="flex items-center gap-2.5 pl-2 border-l border-slate-200">
-          <div className="w-8 h-8 rounded-full bg-blue-100 border border-blue-200 text-blue-700 font-bold flex items-center justify-center text-xs">
+        <div className="flex items-center gap-2.5 pl-2 border-l border-slate-800">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-cyan-500 text-white font-bold flex items-center justify-center text-xs shadow-md border border-cyan-400/30">
             {user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0, 2) : 'U'}
           </div>
           <div className="text-left hidden sm:block">
-            <div className="text-xs font-bold text-slate-900 leading-tight">
+            <div className="text-xs font-bold text-white leading-tight">
               {user?.name}
             </div>
-            <div className="text-[11px] text-slate-500">{user?.unitNumber}</div>
+            <div className="text-[10px] font-mono text-cyan-400 uppercase tracking-wider">{user?.role} · {user?.unitNumber}</div>
           </div>
 
           <button
             onClick={onLogout || logout}
             title="Log Out & Return to Login Screen"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-colors cursor-pointer shadow-xs"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-rose-500/30 bg-rose-950/40 hover:bg-rose-900/60 text-rose-400 text-xs font-bold transition-all cursor-pointer shadow-xs"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Sign Out</span>
