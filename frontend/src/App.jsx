@@ -141,14 +141,14 @@ const AppContent = () => {
                 searchQuery={searchQuery}
               />
             )}
-            {activeTab === 'analytics' && (
+            {(activeTab === 'analytics' || activeTab === 'risk-analytics') && (
               <RiskAnalytics onNavigateTab={setActiveTab} />
             )}
-            {activeTab === 'copilot' && (
-              <AICopilotView onOpenCreateTicket={handleOpenCreateTicket} />
+            {(activeTab === 'copilot' || activeTab === 'ai-copilot') && (
+              <AICopilotView onNavigateTab={setActiveTab} onOpenCreateTicket={handleOpenCreateTicket} />
             )}
             {activeTab === 'billing' && <BillingLedger />}
-            {activeTab === 'dispatch' && <ContractorDispatch />}
+            {(activeTab === 'dispatch' || activeTab === 'technicians') && <ContractorDispatch />}
             {activeTab === 'notices' && <Notices />}
             {activeTab === 'settings' && <Settings />}
             {activeTab === 'outbox' && <OutboxLogs />}
