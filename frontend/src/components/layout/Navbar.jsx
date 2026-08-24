@@ -106,10 +106,11 @@ export const Navbar = ({ onOpenAssistant, onOpenCreateTicket, searchQuery, setSe
 
           <button
             onClick={onLogout || logout}
-            title="Log Out / Switch Account"
-            className="p-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 text-slate-500 transition-colors cursor-pointer"
+            title="Log Out & Return to Login Screen"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-colors cursor-pointer shadow-xs"
           >
             <LogOut className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Sign Out</span>
           </button>
         </div>
       </div>
