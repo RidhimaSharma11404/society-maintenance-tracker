@@ -8,7 +8,7 @@ import {
   LogOut
 } from 'lucide-react';
 
-export const Navbar = ({ onOpenAssistant, onOpenCreateTicket, searchQuery, setSearchQuery, onNavigateTab }) => {
+export const Navbar = ({ onOpenAssistant, onOpenCreateTicket, searchQuery, setSearchQuery, onNavigateTab, onLogout, onGoToLogin }) => {
   const { user, logout, switchDemoRole } = useAuth();
 
   return (
@@ -105,8 +105,8 @@ export const Navbar = ({ onOpenAssistant, onOpenCreateTicket, searchQuery, setSe
           </div>
 
           <button
-            onClick={logout}
-            title="Log Out"
+            onClick={onLogout || logout}
+            title="Log Out / Switch Account"
             className="p-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200 text-slate-500 transition-colors cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />

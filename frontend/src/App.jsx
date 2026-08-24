@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import { Navbar } from './components/layout/Navbar';
@@ -18,7 +18,8 @@ import { GuidedComplaintWizard } from './components/complaints/GuidedComplaintWi
 import { AssistantDrawer } from './components/assistant/AssistantDrawer';
 
 const AppContent = () => {
-  const { isAuthenticated, loading, user } = useAuth();
+  const { isAuthenticated, loading, user, logout } = useAuth();
+  const [currentPath, setCurrentPath] = useState(() => window.location.pathname);
   const [authView, setAuthView] = useState('login');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isWizardOpen, setIsWizardOpen] = useState(false);
@@ -28,22 +29,52 @@ const AppContent = () => {
   const [selectedComplaintId, setSelectedComplaintId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
+  useEffect(() => {
+    const handleLocationChange = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
+
+  const navigateTo = (path) => {
+    window.history.pushState({}, '', path);
+    setCurrentPath(path);
+  };
+
   if (loading) {
     return (
-      <div className="h-screen w-screen bg-slate-50 flex items-center justify-center text-slate-500">
+      <div className="h-screen w-screen bg-[#EEF2F6] flex items-center justify-center text-slate-700 font-sans">
         <div className="flex items-center gap-3">
-          <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-bold text-slate-700 font-mono">Loading Greenwood Heights Portal...</span>
+          <div className="w-5 h-5 border-2 border-[#16233D] border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs font-bold font-mono text-[#16233D]">Loading Greenwood Heights Portal...</span>
         </div>
       </div>
     );
   }
 
-  if (!isAuthenticated) {
-    if (authView === 'register') {
-      return <Register onNavigateToLogin={() => setAuthView('login')} />;
-    }
-    return <Login onNavigateToRegister={() => setAuthView('register')} />;
+  // Explicitly Show Register Page
+  if (currentPath === '/register' || authView === 'register') {
+    return (
+      <Register
+        onNavigateToLogin={() => {
+          setAuthView('login');
+          navigateTo('/login');
+        }}
+      />
+    );
+  }
+
+  // Explicitly Show Login Page if not authenticated OR if visiting /login
+  if (!isAuthenticated || currentPath === '/login') {
+    return (
+      <Login
+        onNavigateToRegister={() => {
+          setAuthView('register');
+          navigateTo('/register');
+        }}
+      />
+    );
   }
 
   const handleOpenCreateTicket = (unit) => {
@@ -61,6 +92,11 @@ const AppContent = () => {
     setIsAssistantOpen(true);
   };
 
+  const handleLogoutAndGoToLogin = () => {
+    logout();
+    navigateTo('/login');
+  };
+
   return (
     <div className="h-screen flex flex-col bg-slate-50 text-slate-900 overflow-hidden font-sans">
       {/* Top Header */}
@@ -70,6 +106,8 @@ const AppContent = () => {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         onNavigateTab={setActiveTab}
+        onLogout={handleLogoutAndGoToLogin}
+        onGoToLogin={() => navigateTo('/login')}
       />
 
       {/* Workspace */}
@@ -92,19 +130,20 @@ const AppContent = () => {
             )}
             {activeTab === 'complaints' && (
               <Complaints
-                initialSelectedComplaintId={selectedComplaintId}
-                externalSearchQuery={searchQuery}
+                selectedComplaintId={selectedComplaintId}
+                setSelectedComplaintId={setSelectedComplaintId}
+                onOpenCreateTicket={handleOpenCreateTicket}
+                searchQuery={searchQuery}
               />
+            )}
+            {activeTab === 'analytics' && (
+              <RiskAnalytics onNavigateTab={setActiveTab} />
+            )}
+            {activeTab === 'copilot' && (
+              <AICopilotView onOpenCreateTicket={handleOpenCreateTicket} />
             )}
             {activeTab === 'billing' && <BillingLedger />}
-            {activeTab === 'technicians' && <ContractorDispatch />}
-            {activeTab === 'risk-analytics' && <RiskAnalytics />}
-            {activeTab === 'ai-copilot' && (
-              <AICopilotView
-                onNavigateTab={setActiveTab}
-                onOpenCreateTicket={() => handleOpenCreateTicket(user?.unitNumber)}
-              />
-            )}
+            {activeTab === 'dispatch' && <ContractorDispatch />}
             {activeTab === 'notices' && <Notices />}
             {activeTab === 'settings' && <Settings />}
             {activeTab === 'outbox' && <OutboxLogs />}
@@ -112,18 +151,19 @@ const AppContent = () => {
         </main>
       </div>
 
-      {/* Step-by-Step Guided Complaint Wizard */}
-      <GuidedComplaintWizard
-        isOpen={isWizardOpen}
-        onClose={() => {
-          setIsWizardOpen(false);
-          setTicketDefaultUnit(null);
-        }}
-        defaultUnit={ticketDefaultUnit}
-        onCreated={() => {}}
-      />
+      {/* Guided Complaint Wizard Modal */}
+      {isWizardOpen && (
+        <GuidedComplaintWizard
+          isOpen={isWizardOpen}
+          onClose={() => setIsWizardOpen(false)}
+          defaultUnit={ticketDefaultUnit}
+          onCreated={() => {
+            setIsWizardOpen(false);
+          }}
+        />
+      )}
 
-      {/* Quick Drawer */}
+      {/* Quick AI Assistant Slide-over Drawer */}
       <AssistantDrawer
         isOpen={isAssistantOpen}
         onClose={() => {
@@ -136,7 +176,7 @@ const AppContent = () => {
   );
 };
 
-export default function App() {
+export function App() {
   return (
     <ToastProvider>
       <AuthProvider>
@@ -145,3 +185,5 @@ export default function App() {
     </ToastProvider>
   );
 }
+
+export default App;
