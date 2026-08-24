@@ -12,8 +12,8 @@ import {
   CreditCard,
   Flame,
   Layers,
-  CheckCircle2,
-  UserCheck
+  Sparkles,
+  CheckCircle2
 } from 'lucide-react';
 
 export const Login = ({ onNavigateToRegister, onLoginSuccess }) => {
@@ -23,35 +23,33 @@ export const Login = ({ onNavigateToRegister, onLoginSuccess }) => {
   const [email, setEmail] = useState('admin@greenwood.com');
   const [password, setPassword] = useState('Password123!');
   const [loading, setLoading] = useState(false);
-  const [selectedRole, setSelectedRole] = useState('admin');
+  const [activeRole, setActiveRole] = useState('admin');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleRoleLogin = async (role, roleEmail) => {
+    setActiveRole(role);
+    setEmail(roleEmail);
+    setPassword('Password123!');
     setLoading(true);
     try {
-      const loggedUser = await login(email, password);
-      toastSuccess(`Authenticated as ${loggedUser.name} (${loggedUser.role.toUpperCase()}).`);
-      window.history.pushState({}, '', '/');
+      const loggedUser = await login(roleEmail, 'Password123!');
+      toastSuccess(`Signed in as ${loggedUser.name} (${role.toUpperCase()}).`);
       if (onLoginSuccess) onLoginSuccess();
     } catch (err) {
-      toastError(err.message || 'Login failed. Please check your credentials.');
+      toastError(err.message || 'Login failed.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleQuickLogin = async (role, demoEmail) => {
-    setSelectedRole(role);
-    setEmail(demoEmail);
-    setPassword('Password123!');
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
     try {
-      const loggedUser = await login(demoEmail, 'Password123!');
-      toastSuccess(`Logged in as ${loggedUser.name} (${role.toUpperCase()}).`);
-      window.history.pushState({}, '', '/');
+      const loggedUser = await login(email, password);
+      toastSuccess(`Signed in as ${loggedUser.name} (${loggedUser.role.toUpperCase()}).`);
       if (onLoginSuccess) onLoginSuccess();
     } catch (err) {
-      toastError(err.message || 'Instant login failed.');
+      toastError(err.message || 'Login failed. Please check your credentials.');
     } finally {
       setLoading(false);
     }
@@ -111,94 +109,105 @@ export const Login = ({ onNavigateToRegister, onLoginSuccess }) => {
         </div>
 
         {/* Center Main Form Block */}
-        <div className="max-w-sm w-full mx-auto my-auto py-8 space-y-6">
+        <div className="max-w-sm w-full mx-auto my-auto py-6 space-y-6">
           <div>
             <h1 className="text-2xl font-bold font-sans text-[#16233D] tracking-tight">
               Sign in to the console.
             </h1>
             <p className="text-xs text-[#6E7C90] mt-1 font-sans">
-              Click any role for 1-tap instant login, or enter credentials below.
+              Choose your role below to log in and access your workspace:
             </p>
           </div>
 
-          {/* 1-Click Instant Demo Login for ALL THREE ROLES */}
-          <div className="space-y-2">
+          {/* THREE PRIMARY 1-CLICK ROLE LOGIN BUTTONS */}
+          <div className="space-y-2.5">
             <div className="flex items-center justify-between text-[10px] font-mono font-bold uppercase tracking-wider text-[#6E7C90]">
-              <span>INSTANT 1-CLICK ACCESS (ALL 3 ROLES)</span>
-              <span className="text-[#2E8B63] font-mono font-bold">READY</span>
+              <span>SELECT LOGIN OPTION</span>
+              <span className="text-[#2E8B63] font-mono font-bold">READY TO ACCESS</span>
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              {/* Role 1: Admin */}
-              <button
-                type="button"
-                disabled={loading}
-                onClick={() => handleQuickLogin('admin', 'admin@greenwood.com')}
-                className={`p-3 text-left border transition-all cursor-pointer ${
-                  selectedRole === 'admin'
-                    ? 'bg-white border-[#16233D] border-l-4 border-l-[#E8A33D] shadow-sm'
-                    : 'bg-white/70 hover:bg-white border-[#CBD3DD] text-[#6E7C90]'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1.5">
-                  <ShieldCheck className="w-4 h-4 text-[#16233D]" />
-                  <span className="text-[9px] font-mono px-1 py-0.2 bg-slate-100 border border-slate-200">L4</span>
-                </div>
-                <div className="text-xs font-bold font-mono text-[#16233D]">ADMIN</div>
-                <div className="text-[10px] font-mono text-[#6E7C90]">Secretary</div>
-              </button>
 
-              {/* Role 2: Staff */}
-              <button
-                type="button"
-                disabled={loading}
-                onClick={() => handleQuickLogin('staff', 'staff@greenwood.com')}
-                className={`p-3 text-left border transition-all cursor-pointer ${
-                  selectedRole === 'staff'
-                    ? 'bg-white border-[#16233D] border-l-4 border-l-[#E8A33D] shadow-sm'
-                    : 'bg-white/70 hover:bg-white border-[#CBD3DD] text-[#6E7C90]'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1.5">
+            {/* Option 1: Admin */}
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => handleRoleLogin('admin', 'admin@greenwood.com')}
+              className="w-full p-3.5 bg-white hover:bg-[#F8FAFC] active:scale-[0.99] border-2 border-[#16233D] border-l-6 border-l-[#E8A33D] flex items-center justify-between transition-all cursor-pointer shadow-sm group text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-[#16233D] text-white flex items-center justify-center">
+                  <ShieldCheck className="w-5 h-5 text-[#E8A33D]" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold font-mono text-[#16233D] group-hover:text-[#E8A33D] transition-colors">
+                    1. LOGIN AS ADMIN
+                  </div>
+                  <div className="text-[11px] text-[#6E7C90]">
+                    Secretary Elena Vance · Full Console & Building Map
+                  </div>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4 text-[#16233D] group-hover:translate-x-1 transition-transform" />
+            </button>
+
+            {/* Option 2: Staff */}
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => handleRoleLogin('staff', 'staff@greenwood.com')}
+              className="w-full p-3.5 bg-white hover:bg-[#F8FAFC] active:scale-[0.99] border border-[#CBD3DD] hover:border-[#16233D] border-l-6 border-l-[#16233D] flex items-center justify-between transition-all cursor-pointer shadow-sm group text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-slate-100 border border-slate-200 text-[#16233D] flex items-center justify-center">
                   <Wrench className="w-4 h-4 text-[#16233D]" />
-                  <span className="text-[9px] font-mono px-1 py-0.2 bg-slate-100 border border-slate-200">OPS</span>
                 </div>
-                <div className="text-xs font-bold font-mono text-[#16233D]">STAFF</div>
-                <div className="text-[10px] font-mono text-[#6E7C90]">Technician</div>
-              </button>
+                <div>
+                  <div className="text-xs font-bold font-mono text-[#16233D] group-hover:text-[#E8A33D] transition-colors">
+                    2. LOGIN AS STAFF / OPS
+                  </div>
+                  <div className="text-[11px] text-[#6E7C90]">
+                    Technician Marcus Cole · Maintenance & Dispatch
+                  </div>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4 text-[#6E7C90] group-hover:translate-x-1 transition-transform" />
+            </button>
 
-              {/* Role 3: Resident */}
-              <button
-                type="button"
-                disabled={loading}
-                onClick={() => handleQuickLogin('resident', 'resident@greenwood.com')}
-                className={`p-3 text-left border transition-all cursor-pointer ${
-                  selectedRole === 'resident'
-                    ? 'bg-white border-[#16233D] border-l-4 border-l-[#E8A33D] shadow-sm'
-                    : 'bg-white/70 hover:bg-white border-[#CBD3DD] text-[#6E7C90]'
-                }`}
-              >
-                <div className="flex items-center justify-between mb-1.5">
-                  <Home className="w-4 h-4 text-[#16233D]" />
-                  <span className="text-[9px] font-mono px-1 py-0.2 bg-slate-100 border border-slate-200">FLAT</span>
+            {/* Option 3: Resident */}
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => handleRoleLogin('resident', 'resident@greenwood.com')}
+              className="w-full p-3.5 bg-white hover:bg-[#F8FAFC] active:scale-[0.99] border border-[#CBD3DD] hover:border-[#16233D] border-l-6 border-l-[#2E8B63] flex items-center justify-between transition-all cursor-pointer shadow-sm group text-left"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center">
+                  <Home className="w-4 h-4 text-emerald-700" />
                 </div>
-                <div className="text-xs font-bold font-mono text-[#16233D]">RESIDENT</div>
-                <div className="text-[10px] font-mono text-[#6E7C90]">Flat 402</div>
-              </button>
-            </div>
+                <div>
+                  <div className="text-xs font-bold font-mono text-[#16233D] group-hover:text-[#2E8B63] transition-colors">
+                    3. LOGIN AS RESIDENT
+                  </div>
+                  <div className="text-[11px] text-[#6E7C90]">
+                    Dr. Arthur Pendelton · Flat 402 Dues & Tickets
+                  </div>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4 text-[#6E7C90] group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
 
-          <div className="relative flex items-center justify-center my-1">
+          <div className="relative flex items-center justify-center my-2">
             <div className="border-t border-[#CBD3DD] w-full" />
             <span className="bg-[#EEF2F6] px-2.5 text-[10px] font-mono text-[#6E7C90] uppercase tracking-wider absolute">
-              OR LOGIN WITH CREDENTIALS
+              OR SIGN IN WITH CUSTOM CREDENTIALS
             </span>
           </div>
 
-          {/* Credentials Form */}
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          {/* Custom Credentials Form */}
+          <form className="space-y-3" onSubmit={handleFormSubmit}>
             <div className="space-y-1">
               <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-[#16233D]">
-                WORK / RESIDENT EMAIL
+                EMAIL ADDRESS
               </label>
               <div className="relative">
                 <Mail className="w-3.5 h-3.5 text-[#6E7C90] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -208,14 +217,14 @@ export const Login = ({ onNavigateToRegister, onLoginSuccess }) => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="name@greenwood.com"
-                  className="w-full pl-9 pr-3.5 py-2.5 bg-white border border-[#CBD3DD] focus:border-[#16233D] text-xs font-mono text-[#16233D] placeholder-[#6E7C90]/60 outline-none transition-colors"
+                  className="w-full pl-9 pr-3.5 py-2 bg-white border border-[#CBD3DD] focus:border-[#16233D] text-xs font-mono text-[#16233D] placeholder-[#6E7C90]/60 outline-none transition-colors"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
               <label className="block text-[10px] font-mono font-bold uppercase tracking-wider text-[#16233D]">
-                SECURITY KEY // PASSWORD
+                PASSWORD
               </label>
               <div className="relative">
                 <Lock className="w-3.5 h-3.5 text-[#6E7C90] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -225,7 +234,7 @@ export const Login = ({ onNavigateToRegister, onLoginSuccess }) => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className="w-full pl-9 pr-3.5 py-2.5 bg-white border border-[#CBD3DD] focus:border-[#16233D] text-xs font-mono text-[#16233D] placeholder-[#6E7C90]/60 outline-none transition-colors"
+                  className="w-full pl-9 pr-3.5 py-2 bg-white border border-[#CBD3DD] focus:border-[#16233D] text-xs font-mono text-[#16233D] placeholder-[#6E7C90]/60 outline-none transition-colors"
                 />
               </div>
             </div>
@@ -234,20 +243,20 @@ export const Login = ({ onNavigateToRegister, onLoginSuccess }) => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 bg-[#E8A33D] hover:bg-[#d97d15] active:scale-98 text-[#16233D] text-xs font-sans font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
+              className="w-full py-2.5 px-4 bg-[#E8A33D] hover:bg-[#d97d15] active:scale-98 text-[#16233D] text-xs font-sans font-bold transition-all cursor-pointer shadow-xs disabled:opacity-50 flex items-center justify-center gap-2 mt-1"
             >
-              <span>{loading ? 'Authenticating...' : 'Sign In to Portal'}</span>
+              <span>{loading ? 'Authenticating...' : 'Sign In with Credentials'}</span>
               <ArrowRight className="w-3.5 h-3.5 text-[#16233D]" />
             </button>
           </form>
 
-          {/* Sublinks: Registration link is prominent & functional */}
+          {/* Sublinks */}
           <div className="pt-2 flex items-center justify-between text-xs text-[#6E7C90] border-t border-[#CBD3DD]">
             <a
               href="#forgot"
               onClick={(e) => {
                 e.preventDefault();
-                alert('Please contact Society Secretary at admin@greenwood.com for password reset assistance.');
+                alert('Default password for all demo accounts is: Password123!');
               }}
               className="hover:text-[#16233D] transition-colors"
             >

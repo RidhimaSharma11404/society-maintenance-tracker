@@ -1,70 +1,54 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import api from '../services/api';
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('society_auth_user');
-    try {
-      return savedUser ? JSON.parse(savedUser) : null;
-    } catch {
-      return null;
-    }
-  });
-  const [token, setToken] = useState(() => localStorage.getItem('society_auth_token') || null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const verifyUser = async () => {
-      if (token) {
-        try {
-          const res = await api.get('/auth/me');
-          const verifiedUser = res?.data?.user || res?.user || res?.data;
-          if (verifiedUser) {
-            setUser(verifiedUser);
-            localStorage.setItem('society_auth_user', JSON.stringify(verifiedUser));
-          }
-        } catch {
-          // Keep current state
-        }
-      }
-      setLoading(false);
-    };
-
-    verifyUser();
-  }, [token]);
+  // Start with null so the Login page is always the first screen when opening the site
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const login = async (email, password) => {
-    const res = await api.post('/auth/login', { email, password });
-    const authUser = res?.data?.user || res?.user || (res?.data?.role ? res.data : null);
-    const authToken = res?.data?.token || res?.token || `token_${Date.now()}`;
-    
-    if (!authUser) {
-      throw new Error('Invalid email or password.');
-    }
+    setLoading(true);
+    try {
+      const res = await api.post('/auth/login', { email, password });
+      const authUser = res?.data?.user || res?.user || (res?.data?.role ? res.data : null);
+      const authToken = res?.data?.token || res?.token || `token_${Date.now()}`;
+      
+      if (!authUser) {
+        throw new Error('Invalid credentials.');
+      }
 
-    setToken(authToken);
-    setUser(authUser);
-    localStorage.setItem('society_auth_token', authToken);
-    localStorage.setItem('society_auth_user', JSON.stringify(authUser));
-    return authUser;
+      setToken(authToken);
+      setUser(authUser);
+      localStorage.setItem('society_auth_token', authToken);
+      localStorage.setItem('society_auth_user', JSON.stringify(authUser));
+      return authUser;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const register = async (userData) => {
-    const res = await api.post('/auth/register', userData);
-    const authUser = res?.data?.user || res?.user || (res?.data?.role ? res.data : null);
-    const authToken = res?.data?.token || res?.token || `token_${Date.now()}`;
-    
-    if (!authUser) {
-      throw new Error('Registration failed.');
-    }
+    setLoading(true);
+    try {
+      const res = await api.post('/auth/register', userData);
+      const authUser = res?.data?.user || res?.user || (res?.data?.role ? res.data : null);
+      const authToken = res?.data?.token || res?.token || `token_${Date.now()}`;
+      
+      if (!authUser) {
+        throw new Error('Registration failed.');
+      }
 
-    setToken(authToken);
-    setUser(authUser);
-    localStorage.setItem('society_auth_token', authToken);
-    localStorage.setItem('society_auth_user', JSON.stringify(authUser));
-    return authUser;
+      setToken(authToken);
+      setUser(authUser);
+      localStorage.setItem('society_auth_token', authToken);
+      localStorage.setItem('society_auth_user', JSON.stringify(authUser));
+      return authUser;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const logout = () => {
