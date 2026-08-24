@@ -16,7 +16,7 @@ import {
   UserCheck
 } from 'lucide-react';
 
-export const Login = ({ onNavigateToRegister }) => {
+export const Login = ({ onNavigateToRegister, onLoginSuccess }) => {
   const { login } = useAuth();
   const { error: toastError, success: toastSuccess } = useToast();
 
@@ -31,6 +31,8 @@ export const Login = ({ onNavigateToRegister }) => {
     try {
       const loggedUser = await login(email, password);
       toastSuccess(`Authenticated as ${loggedUser.name} (${loggedUser.role.toUpperCase()}).`);
+      window.history.pushState({}, '', '/');
+      if (onLoginSuccess) onLoginSuccess();
     } catch (err) {
       toastError(err.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -46,6 +48,8 @@ export const Login = ({ onNavigateToRegister }) => {
     try {
       const loggedUser = await login(demoEmail, 'Password123!');
       toastSuccess(`Logged in as ${loggedUser.name} (${role.toUpperCase()}).`);
+      window.history.pushState({}, '', '/');
+      if (onLoginSuccess) onLoginSuccess();
     } catch (err) {
       toastError(err.message || 'Instant login failed.');
     } finally {

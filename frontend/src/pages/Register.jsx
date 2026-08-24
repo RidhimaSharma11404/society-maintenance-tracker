@@ -14,7 +14,7 @@ import {
   Building
 } from 'lucide-react';
 
-export const Register = ({ onNavigateToLogin }) => {
+export const Register = ({ onNavigateToLogin, onRegisterSuccess }) => {
   const { register } = useAuth();
   const { error: toastError, success: toastSuccess } = useToast();
 
@@ -50,6 +50,8 @@ export const Register = ({ onNavigateToLogin }) => {
     try {
       const authUser = await register(formData);
       toastSuccess(`Welcome to Greenwood Heights, ${authUser.name}! Resident account active.`);
+      window.history.pushState({}, '', '/');
+      if (onRegisterSuccess) onRegisterSuccess();
     } catch (err) {
       toastError(err.message || 'Registration failed. Please check your details.');
     } finally {

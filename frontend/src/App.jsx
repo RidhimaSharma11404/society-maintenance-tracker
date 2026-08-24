@@ -53,25 +53,30 @@ const AppContent = () => {
     );
   }
 
-  // Explicitly Show Register Page
-  if (currentPath === '/register' || authView === 'register') {
-    return (
-      <Register
-        onNavigateToLogin={() => {
-          setAuthView('login');
-          navigateTo('/login');
-        }}
-      />
-    );
-  }
-
-  // Explicitly Show Login Page if not authenticated OR if visiting /login
-  if (!isAuthenticated || currentPath === '/login') {
+  // If NOT authenticated, show Login or Register
+  if (!isAuthenticated) {
+    if (currentPath === '/register' || authView === 'register') {
+      return (
+        <Register
+          onNavigateToLogin={() => {
+            setAuthView('login');
+            navigateTo('/login');
+          }}
+          onRegisterSuccess={() => {
+            setAuthView('login');
+            navigateTo('/');
+          }}
+        />
+      );
+    }
     return (
       <Login
         onNavigateToRegister={() => {
           setAuthView('register');
           navigateTo('/register');
+        }}
+        onLoginSuccess={() => {
+          navigateTo('/');
         }}
       />
     );
