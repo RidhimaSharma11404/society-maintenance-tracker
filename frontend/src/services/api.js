@@ -6,7 +6,7 @@ const getBaseUrl = () => {
   }
   // When running on Vercel frontend, connect to the live backend API
   if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
-    return 'https://thin-papers-heal.loca.lt/api';
+    return 'https://tough-baths-bow.loca.lt/api';
   }
   return '/api';
 };
