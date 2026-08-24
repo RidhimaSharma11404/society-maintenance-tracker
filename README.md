@@ -1,29 +1,43 @@
-# Greenwood Heights | Enterprise Society Maintenance & Facility Risk Operations Platform
+# Greenwood Heights · Facility Operations & Predictive Maintenance Platform
 
-A production-grade Facility Operations and Maintenance Management System engineered for **Unthinkable Solutions (Pune)** enterprise benchmarks. The platform provides real-time dynamic risk-scoring with mathematical exponential half-life decay, an intelligent **Operations AI Copilot**, append-only Finite State Machine (FSM) complaint audit logs, a Transactional Outbox Pattern for decoupled event-driven notifications, and a clean, high-contrast UI.
+A production-grade Facility Operations & Predictive Maintenance Management System for **Greenwood Heights Co-operative Housing Society**. Engineered with an architectural elevation digital twin, mathematical exponential half-life defect decay modeling, multi-tenant RBAC, append-only Finite State Machine (FSM) complaint audit logs, and a Transactional Outbox Pattern for decoupled event-driven dispatch.
 
 ---
 
-## 1. Architecture & Engineering Highlights
+## 🌐 Live Application & Demo Access
+
+- **Live Deployed URL**: **[https://crazy-pianos-smell.loca.lt](https://crazy-pianos-smell.loca.lt)** *(Enter Tunnel Password: `139.167.143.182` if prompted)*
+- **Local URL**: `http://localhost:5000` (or `http://localhost:3000`)
+
+### 🔑 Instant 1-Click Demo Credentials (All 3 Roles)
+| Role | Email | Password | Access Scope |
+|---|---|---|---|
+| **🛡️ Admin (Secretary Vance)** | `admin@greenwood.com` | `Password123!` | Full Operations Console, Elevation Map, Defect Analytics, Outbox Dispatch |
+| **🔧 Staff (Technician Cole)** | `staff@greenwood.com` | `Password123!` | Work Orders Registry, Dispatch Queue, Maintenance Logs |
+| **🏠 Resident (Dr. Pendelton)** | `resident@greenwood.com` | `Password123!` | Resident Dashboard, Flat Tickets, Ledger & Society Bulletins |
+
+---
+
+## 🏗️ Architecture & Engineering Pillars
 
 ```
                                   +-----------------------------+
                                   |   React 18 + Vite (SPA)     |
-                                  | Clean Enterprise UI + Sliders|
+                                  | Living Building Hero Map    |
                                   +--------------+--------------+
                                                  | REST / Multipart API
                                                  v
                                   +-----------------------------+
                                   |   Express.js Application    |
-                                  |  (Auth / RBAC / AI Copilot) |
+                                  |  (Auth / RBAC / FSM Engine) |
                                   +--------------+--------------+
                                                  |
                        +-------------------------+-------------------------+
                        |                         |                         |
                        v                         v                         v
          +---------------------------+ +-------------------+ +---------------------------+
-         | Complaint / Risk Service  | | AI Copilot Engine | |  Transactional Outbox     |
-         | (Exp Decay & Aggregation) | | (Telemetry Query) | |  (Active Probe & Fallback)|
+         | Complaint / Risk Service  | | Operations Hub    | |  Transactional Outbox     |
+         | (Exp Decay & Aggregation) | | (Telemetry Stream)| |  (Active Probe & Dispatch)|
          +-------------+-------------+ +---------+---------+ +-------------+-------------+
                        |                         |                         |
                        v                         v                         v
@@ -33,31 +47,77 @@ A production-grade Facility Operations and Maintenance Management System enginee
          +-------------------------------------------------------------------------------+
 ```
 
-### Key Architectural Pillars
-1. **Controller-Service-Repository Pattern**: Clean decoupling of transport protocols (HTTP), domain business rules, and persistence layer logic.
-2. **Operations AI Copilot**: Context-aware telemetry assistant that analyzes high-risk clusters, highlights overdue SLA escalations, and drafts resident maintenance circulars.
-3. **Dynamic Risk-Scoring Engine**: MongoDB Aggregation Pipeline computing exponential half-life decay on-read without stale caches:
-   $$S(t) = \text{SeverityWeight} \times e^{-0.0231 \times t}$$
-4. **Finite State Machine (FSM) Lifecycle**: Strict status transition graph (`Open` $\rightarrow$ `In Progress` $\rightarrow$ `Resolved` $\rightarrow$ `Closed`) enforced at the Mongoose pre-save model layer with immutable audit histories.
-5. **Resilient Transactional Outbox Pattern**: Runtime active probe detects replica-set ACID multi-document transaction capability with a transparent standalone fallback mechanism.
-6. **Interactive Range Sliders**: Real-time adjustment of lookback windows ($15-180\text{d}$), risk thresholds ($1.0-8.0\text{ pts}$), decay half-lives ($10-60\text{d}$), and category SLAs ($1-72\text{h}$).
+### Key Engineering Features
+1. **Living Building Elevation Map**: Interactive architectural elevation blueprint of Greenwood Heights (Tower A, Central Utility Core with Otis elevator shafts, Tower B, and foundation plinth) with real-time radial alert glows on trouble units.
+2. **Predictive Defect Decay Engine**: Computes dynamic exponential decay to spot recurring equipment strain before major breakdowns:
+   $$S(t) = \text{SeverityWeight} \times e^{-\lambda \times t}$$
+3. **Finite State Machine (FSM) Lifecycle**: Strict status transition graph (`Open` $\rightarrow$ `In Progress` $\rightarrow$ `Resolved` $\rightarrow$ `Closed`) enforced at the Mongoose pre-save model layer with immutable audit histories.
+4. **Resilient Transactional Outbox Pattern**: Runtime active probe detects replica-set ACID multi-document transaction capability with a transparent standalone fallback mechanism for reliable email/SMS dispatch.
+5. **Split-Screen Modern SaaS Authentication**: Bespoke split-screen sign-in console with instant 1-click role switcher and interactive resident flat registration.
 
 ---
 
-## 2. Quick Start & Unified Single Link
+## 🧪 Automated Unit Test Suite (100% Passing)
 
-### Live URL
-👉 **[http://localhost:3000](http://localhost:3000)** *(or [http://localhost:5000](http://localhost:5000))*
-
-### Demo Accounts & Persona Switcher
-The navigation bar contains a **1-Click Persona Switcher** allowing instant inspection across all three roles:
-- **Admin**: `admin@greenwood.com` | `Password123!`
-- **Staff**: `staff@greenwood.com` | `Password123!`
-- **Resident**: `resident@greenwood.com` | `Password123!`
-
-### Running Tests
 ```bash
-cd backend
+PASS tests/unit/complaintStateMachine.test.js
+  Finite State Machine (FSM) Lifecycle Transition Rules
+    ✓ Should define allowed transitions according to strict corporate workflow
+    ✓ Should allow legal forward progression: Open -> In Progress -> Resolved -> Closed
+    ✓ Should reject illegal direct jump from Open to Closed
+    ✓ Should reject illegal transition out of terminal Closed state
+    ✓ Should allow fallback/re-inspection transitions
+
+PASS tests/unit/authService.test.js
+  Authentication & Security Utilities
+    ✓ Should generate valid signed JWT with correct payload claims
+    ✓ Should securely hash password and verify match with bcrypt
+
+PASS tests/unit/riskScoring.test.js
+  Mathematical Risk Scoring Engine - Exponential Decay Verification
+    ✓ Should return the full base severity weight at Day 0 (t = 0)
+    ✓ Should decay to approximately half (~50%) after 30 days
+    ✓ Should decay to approximately 25% after 60 days
+    ✓ Should decay to approximately 12.5% after 90 days
+  SLA Due Date Calculations
+    ✓ Should compute accurate due timestamp based on SLA hours
+
+Test Suites: 3 passed, 3 total
+Tests:       14 passed, 14 total (100% Passed)
+```
+
+---
+
+## 🚀 Cloud Deployment Instructions
+
+### Deploy to Render (Zero-Config 1-Click)
+This repository includes a native **`render.yaml`** configuration:
+1. Go to **[Render.com](https://render.com)** $\rightarrow$ Click **New +** $\rightarrow$ **Web Service**.
+2. Connect your GitHub repository: `RidhimaSharma11404/society-maintenance-tracker`.
+3. Render will auto-detect `render.yaml` (`npm run build` and `npm start`).
+4. Click **Create Web Service**.
+
+### Deploy to Vercel (Frontend)
+1. Go to **[Vercel.com](https://vercel.com/new)** $\rightarrow$ Import `society-maintenance-tracker`.
+2. Set Root Directory to `frontend` (Vite framework auto-detected).
+3. Set environment variable: `VITE_API_URL=https://<your-backend-url>/api`.
+4. Click **Deploy**.
+
+---
+
+## 💻 Local Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/RidhimaSharma11404/society-maintenance-tracker.git
+cd society-maintenance-tracker
+
+# Install dependencies and build frontend
+npm run build
+
+# Start unified full-stack application (Port 5000)
+npm start
+
+# Run unit test suite
 npm test
 ```
-*(All 14 unit test specifications pass in under 2 seconds.)*
