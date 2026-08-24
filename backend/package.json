@@ -1,0 +1,43 @@
+{
+  "name": "society-maintenance-tracker-backend",
+  "version": "1.0.0",
+  "description": "Enterprise Society Maintenance Management Backend with Dynamic Risk Scoring and Transactional Outbox Pattern",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "seed": "node src/scripts/seed.js",
+    "test": "jest tests/unit --verbose --runInBand --detectOpenHandles --forceExit",
+    "test:all": "jest --runInBand --detectOpenHandles --forceExit"
+  },
+  "keywords": [
+    "society-maintenance",
+    "risk-scoring",
+    "transactional-outbox",
+    "event-driven",
+    "mongoose"
+  ],
+  "author": "Society Management Engineering Team",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.41.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.1",
+    "multer": "^1.4.5-lts.1",
+    "streamifier": "^0.1.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^9.2.0",
+    "nodemon": "^3.1.2",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "verbose": true
+  }
+}

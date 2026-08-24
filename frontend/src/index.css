@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#EEF2F6] text-[#16233D] antialiased font-sans;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'tnum';
+  }
+}
+
+/* Living Building Telemetry Glow & Motion Animations */
+@keyframes alertPulseCritical {
+  0%, 100% {
+    box-shadow: 0 0 0px rgba(198, 67, 61, 0), 0 0 14px rgba(198, 67, 61, 0.45);
+    border-color: #C6433D;
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(198, 67, 61, 0.75), 0 0 36px rgba(198, 67, 61, 0.3);
+    border-color: #FF5A52;
+  }
+}
+
+@keyframes alertPulseAmber {
+  0%, 100% {
+    box-shadow: 0 0 0px rgba(232, 137, 28, 0), 0 0 12px rgba(232, 137, 28, 0.4);
+    border-color: #E8891C;
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(232, 137, 28, 0.65), 0 0 30px rgba(232, 137, 28, 0.25);
+    border-color: #FFAE42;
+  }
+}
+
+.glow-critical {
+  animation: alertPulseCritical 2.2s infinite ease-in-out;
+}
+
+.glow-high {
+  animation: alertPulseAmber 2.6s infinite ease-in-out;
+}
+
+.living-unit {
+  transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.living-unit:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 24px -4px rgba(22, 35, 61, 0.14);
+  z-index: 30;
+}
+
+/* Smooth Crossfade View Switcher */
+.fade-enter {
+  opacity: 0;
+  transform: translateY(4px);
+}
+.fade-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+/* Custom Clean Technical Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #EEF2F6;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD3DD;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6E7C90;
+}
