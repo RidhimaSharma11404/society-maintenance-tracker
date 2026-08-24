@@ -10,27 +10,28 @@ An enterprise-grade Facility Operations & Predictive Maintenance Platform engine
 
 ---
 
-## 🌐 Live Production Application
+## 🌐 1. Live Production Application & Demo URLs
 
-- **Live URL**: **[https://society-maintenance-tracker-five-delta.vercel.app](https://society-maintenance-tracker-five-delta.vercel.app)**
-- **Direct Login**: **[https://society-maintenance-tracker-five-delta.vercel.app/login](https://society-maintenance-tracker-five-delta.vercel.app/login)**
+- **Live Production App**: **[https://society-maintenance-tracker-five-delta.vercel.app](https://society-maintenance-tracker-five-delta.vercel.app)**
+- **Direct Login Screen**: **[https://society-maintenance-tracker-five-delta.vercel.app/login](https://society-maintenance-tracker-five-delta.vercel.app/login)**
 - **Resident Flat Registration**: **[https://society-maintenance-tracker-five-delta.vercel.app/register](https://society-maintenance-tracker-five-delta.vercel.app/register)**
+- **GitHub Repository**: **[https://github.com/RidhimaSharma11404/society-maintenance-tracker](https://github.com/RidhimaSharma11404/society-maintenance-tracker)**
 
 ---
 
-## 🔑 1-Click Instant Demo Credentials
+## 🔑 2. 1-Click Instant Demo Credentials
 
-The platform features instant 1-click authentication cards on the login screen for testing all 3 user roles:
+The login page features 1-click access buttons for all three roles:
 
 | Role | Name | Email | Password | Access Scope |
 |---|---|---|---|---|
-| **🛡️ ADMIN** | Secretary Elena Vance | `admin@greenwood.com` | `Password123!` | Full Operations Console, Architectural Elevation Map, Connected Risk Analytics, Contractor Dispatch, Outbox Event Logs |
+| **🛡️ ADMIN** | Secretary Elena Vance | `admin@greenwood.com` | `Password123!` | Full Operations Console, Architectural Elevation Map, Connected Risk Analytics, Priority Queue, Outbox Dispatch Logs |
 | **🔧 STAFF** | Technician Marcus Cole | `staff@greenwood.com` | `Password123!` | Work Orders Timeline, Priority Queue, Status Progression, Maintenance Inspections |
-| **🏠 RESIDENT** | Dr. Arthur Pendelton | `resident@greenwood.com` | `Password123!` | Flat 402 Maintenance Dues Ledger, 1-Click Ticket Logging, Society Bulletins & Circulars |
+| **🏠 RESIDENT** | Dr. Arthur Pendelton | `resident@greenwood.com` | `Password123!` | Flat 402 Maintenance Dues Ledger, 1-Click Ticket Logging with Photos, Pinned Society Circulars |
 
 ---
 
-## 🏗️ System Architecture & Engineering Design
+## 🏗️ 3. System Architecture & Engineering Design
 
 ```
                                   +---------------------------------------+
@@ -45,7 +46,7 @@ The platform features instant 1-click authentication cards on the login screen f
                                   |   Express.js Application Gateway      |
                                   |  - JWT Authentication & RBAC Policy   |
                                   |  - FSM State Transition Validator     |
-                                  |  - Centralized Error Handling         |
+                                  |  - Multer Photo Upload Pipeline       |
                                   +-------------------+-------------------+
                                                       |
                           +---------------------------+---------------------------+
@@ -66,56 +67,134 @@ The platform features instant 1-click authentication cards on the login screen f
 
 ---
 
-## 🔬 Core Engineering Pillars
+## 📊 4. Database Schema (Mongoose Models)
 
-### 1. Living Building Elevation Digital Twin
-- Interactive architectural elevation map visualizing **Tower A (Units 101–402)**, **Central Utility Core (Otis Elevator Shafts & Water Pumps)**, and **Tower B (Units 101–402)**.
-- Pulse alert keyframes highlighting high-risk and critical units with real-time radial glow telemetry.
+### `User`
+```json
+{
+  "_id": "ObjectId",
+  "name": "String (required)",
+  "email": "String (required, unique, indexed)",
+  "password": "String (bcrypt hash, select: false)",
+  "role": "enum: ['admin', 'staff', 'resident']",
+  "unitNumber": "String (e.g. 'Tower A - 402')",
+  "phoneNumber": "String",
+  "createdAt": "Date"
+}
+```
 
-### 2. Mathematical Exponential Half-Life Defect Decay Engine
-- Spots recurring equipment strain across plumbing, lifts, and electrical systems before catastrophic failure:
-  $$S(t) = \text{SeverityWeight} \times e^{-\lambda \times t} \quad \text{where} \quad \lambda = \frac{\ln(2)}{t_{1/2}}$$
-- Configurable lookback windows ($15\text{d} - 180\text{d}$), decay half-lives ($10\text{d} - 60\text{d}$), and risk thresholds ($1.0 - 8.0\text{ pts}$) with 1-click operational presets (*Standard*, *High Sensitivity Monsoon*, *Critical Emergencies Only*).
+### `Complaint` (with Immutable FSM Audit History)
+```json
+{
+  "_id": "ObjectId",
+  "title": "String (required, max 100)",
+  "description": "String (required)",
+  "category": "String (Plumbing, Electrical, Elevator, Civil, etc.)",
+  "priority": "enum: ['Low', 'Medium', 'High']",
+  "unitNumber": "String (e.g. 'Tower B - 101')",
+  "resident": "ObjectId -> User (ref)",
+  "assignedStaff": "ObjectId -> User (ref, optional)",
+  "images": ["String (relative upload path)"],
+  "currentStatus": "enum: ['Open', 'In Progress', 'Resolved', 'Closed']",
+  "dueDate": "Date (computed from SLA hours)",
+  "createdAt": "Date",
+  "updatedAt": "Date",
+  "statusHistory": [
+    {
+      "status": "enum: ['Open', 'In Progress', 'Resolved', 'Closed']",
+      "changedBy": "ObjectId -> User (ref)",
+      "comment": "String (optional note)",
+      "timestamp": "Date (default: now)"
+    }
+  ]
+}
+```
 
-### 3. Strict Finite State Machine (FSM) Complaint Lifecycle
-- Compliant with enterprise corporate workflows (`Open` $\rightarrow$ `In Progress` $\rightarrow$ `Resolved` $\rightarrow$ `Closed`).
-- Rejects illegal state jumps (e.g. `Open` directly to `Closed`) and enforces an append-only, immutable audit trail for every status update.
+### `Notice` (Notice Board with Pinned Alerts)
+```json
+{
+  "_id": "ObjectId",
+  "title": "String (required)",
+  "content": "String (required)",
+  "category": "enum: ['Maintenance', 'Safety', 'Billing', 'General']",
+  "priority": "enum: ['General', 'High', 'Urgent']",
+  "isImportant": "Boolean (pinned to top when true)",
+  "issuedBy": "ObjectId -> User (ref)",
+  "createdAt": "Date"
+}
+```
 
-### 4. Resilient Transactional Outbox Pattern
-- Decouples user transactions from external email/SMS notifications.
-- Runtime active probe detects replica-set ACID multi-document transaction capability with a transparent standalone fallback mechanism.
+### `CategorySetting` (Configurable SLA & Severity Weights)
+```json
+{
+  "_id": "ObjectId",
+  "category": "String (unique)",
+  "severityWeight": "Number (1 - 5)",
+  "slaHours": "Number (1 - 72)",
+  "description": "String"
+}
+```
 
-### 5. Resilient Zero-Config Deployment
-- Automatically connects to cloud MongoDB instances or boots an embedded in-memory database engine with seed fixtures for zero-friction demonstrations.
+### `NotificationOutbox` (Transactional Outbox Events)
+```json
+{
+  "_id": "ObjectId",
+  "eventType": "enum: ['COMPLAINT_STATUS_CHANGED', 'IMPORTANT_NOTICE_POSTED', 'SLA_BREACH_ALERT']",
+  "payload": "Object",
+  "recipient": "String (email/phone)",
+  "channel": "enum: ['EMAIL', 'SMS']",
+  "status": "enum: ['PENDING', 'DELIVERED', 'FAILED']",
+  "retryCount": "Number (default: 0)",
+  "createdAt": "Date"
+}
+```
 
 ---
 
-## 🧪 Automated Unit Test Suite (100% Passing)
+## 📡 5. API Documentation
+
+| Method | Endpoint | Access Level | Description |
+|---|---|---|---|
+| `POST` | `/api/auth/register` | Public | Register new resident flat owner account |
+| `POST` | `/api/auth/login` | Public | Authenticate user & return signed JWT token |
+| `GET` | `/api/auth/me` | Authenticated | Retrieve current session profile |
+| `GET` | `/api/dashboard/summary` | Admin / Staff | Aggregated counts by status, category & overdue tickets |
+| `GET` | `/api/complaints` | Resident / Staff | List complaints (Residents see own; Admins see all with filters) |
+| `POST` | `/api/complaints` | Resident | Create complaint with photo attachment (`multipart/form-data`) |
+| `PUT` | `/api/complaints/:id/status`| Admin / Staff | Transition FSM status & append note to audit history |
+| `GET` | `/api/notices` | Authenticated | Retrieve notice board with pinned important circulars |
+| `POST` | `/api/notices` | Admin | Post new circular (optionally marked `isImportant`) |
+| `GET` | `/api/settings` | Admin | Retrieve category SLA & severity thresholds |
+| `PUT` | `/api/settings` | Admin | Update category SLA hours & severity weights |
+| `GET` | `/api/technicians` | Admin / Staff | List active contractors & dispatch directory |
+| `POST` | `/api/technicians/dispatch`| Admin / Staff | Dispatch contractor to unit for urgent maintenance |
+
+---
+
+## 🧪 6. Automated Unit Test Suite (100% Passing)
 
 ```bash
 PASS tests/unit/complaintStateMachine.test.js
   Finite State Machine (FSM) Lifecycle Transition Rules
-    ✓ Should define allowed transitions according to strict corporate workflow (8 ms)
-    ✓ Should allow legal forward progression: Open -> In Progress -> Resolved -> Closed (3 ms)
-    ✓ Should reject illegal direct jump from Open to Closed (1 ms)
-    ✓ Should reject illegal transition out of terminal Closed state (1 ms)
-    ✓ Should allow fallback/re-inspection transitions (In Progress -> Open, Resolved -> In Progress) (1 ms)
+    ✓ Should define allowed transitions according to strict corporate workflow
+    ✓ Should allow legal forward progression: Open -> In Progress -> Resolved -> Closed
+    ✓ Should reject illegal direct jump from Open to Closed
+    ✓ Should reject illegal transition out of terminal Closed state
+    ✓ Should allow fallback/re-inspection transitions
 
 PASS tests/unit/authService.test.js
   Authentication & Security Utilities
-    ✓ Should generate valid signed JWT with correct payload claims (7 ms)
-    ✓ Should securely hash password and verify match with bcrypt (317 ms)
+    ✓ Should generate valid signed JWT with correct payload claims
+    ✓ Should securely hash password and verify match with bcrypt
 
 PASS tests/unit/riskScoring.test.js
   Mathematical Risk Scoring Engine - Exponential Decay Verification
-    ✓ Should return the full base severity weight at Day 0 (t = 0) (2 ms)
-    ✓ Should decay to approximately half (~50%) of severity weight after 30 days (1 ms)
-    ✓ Should decay to approximately 25% of severity weight after 60 days (1 ms)
-    ✓ Should decay to approximately 12.5% of severity weight after 90 days (2 ms)
-    ✓ Should handle edge cases gracefully (negative daysAgo treated as 0) (2 ms)
+    ✓ Should return the full base severity weight at Day 0 (t = 0)
+    ✓ Should decay to approximately half (~50%) after 30 days
+    ✓ Should decay to approximately 25% after 60 days
+    ✓ Should decay to approximately 12.5% after 90 days
   SLA Due Date Calculations
-    ✓ Should compute accurate due timestamp based on SLA hours (1 ms)
-    ✓ Should accurately add fractional or short emergency SLA hours (1 ms)
+    ✓ Should compute accurate due timestamp based on SLA hours
 
 Test Suites: 3 passed, 3 total
 Tests:       14 passed, 14 total (100% Passing)
@@ -123,7 +202,7 @@ Tests:       14 passed, 14 total (100% Passing)
 
 ---
 
-## 💻 Local Development Quickstart
+## 💻 7. Local Development Quickstart
 
 ```bash
 # 1. Clone the repository
@@ -142,5 +221,5 @@ npm test
 
 ---
 
-## 📄 License
-This project is licensed under the **MIT License**.
+## 📄 8. System Design Write-Up
+See the complete 800-word System Design write-up in [SYSTEM_DESIGN.md](./SYSTEM_DESIGN.md).
