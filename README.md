@@ -6,7 +6,7 @@ A production-grade Facility Operations & Predictive Maintenance Management Syste
 
 ## 🌐 Live Application & Demo Access
 
-- **Live Deployed URL**: **[https://crazy-pianos-smell.loca.lt](https://crazy-pianos-smell.loca.lt)** *(Enter Tunnel Password: `139.167.143.182` if prompted)*
+- **Live Deployed URL**: **[https://thin-papers-heal.loca.lt](https://thin-papers-heal.loca.lt)** *(Enter Tunnel Password: `139.167.143.182` if prompted)*
 - **Local URL**: `http://localhost:5000` (or `http://localhost:3000`)
 
 ### 🔑 Instant 1-Click Demo Credentials (All 3 Roles)
