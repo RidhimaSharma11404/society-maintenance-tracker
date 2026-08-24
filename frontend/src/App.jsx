@@ -103,7 +103,7 @@ const AppContent = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-[#070D18] text-slate-100 overflow-hidden font-sans">
+    <div className="h-screen flex flex-col bg-slate-50 text-slate-900 overflow-hidden font-sans">
       {/* Top Header */}
       <Navbar
         onOpenAssistant={() => setIsAssistantOpen(true)}
@@ -123,7 +123,7 @@ const AppContent = () => {
         />
 
         {/* Content Viewport */}
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8 bg-[#070D18] text-slate-100">
+        <main className="flex-1 overflow-y-auto p-6 lg:p-8 bg-slate-50">
           <div className="max-w-6xl mx-auto">
             {activeTab === 'dashboard' && (
               <Dashboard

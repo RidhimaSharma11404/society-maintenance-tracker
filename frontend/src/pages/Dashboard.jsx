@@ -14,17 +14,10 @@ import {
   Building,
   Bell,
   Activity,
-  ArrowUpRight,
-  Sparkles,
-  ShieldCheck,
-  Wrench,
-  Flame,
-  Zap,
-  CheckCircle2,
-  Clock
+  ArrowUpRight
 } from 'lucide-react';
 
-export const Dashboard = ({ onNavigateTab, onSelectComplaint, onOpenCreateTicket, onOpenAssistantWithPrompt }) => {
+export const Dashboard = ({ onNavigateTab, onSelectComplaint, onOpenCreateTicket }) => {
   const { user } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -58,119 +51,101 @@ export const Dashboard = ({ onNavigateTab, onSelectComplaint, onOpenCreateTicket
   if (loading) {
     return (
       <div className="p-24 flex items-center justify-center min-h-[50vh]">
-        <div className="flex flex-col items-center gap-3 text-slate-400">
-          <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-          <p className="text-xs font-mono text-cyan-300 uppercase tracking-wider">
-            Connecting to campus telemetry...
+        <div className="flex flex-col items-center gap-3 text-[#6E7C90]">
+          <div className="w-7 h-7 border-2 border-[#16233D] border-t-transparent animate-spin" />
+          <p className="text-xs font-mono text-[#16233D] uppercase tracking-wider">
+            Connecting to building sensors...
           </p>
         </div>
       </div>
     );
   }
 
-  const kpi = data?.kpi || {
-    activeComplaints: 3,
-    openComplaints: 1,
-    inProgressComplaints: 2,
-    overdueComplaints: 1,
-    highRiskClustersCount: 3,
-    resolutionRate: 57
-  };
+  const kpi = data?.kpi || {};
   const riskAnalytics = data?.riskAnalytics || {};
-  const recentComplaints = data?.recentComplaints || data?.items || [];
-  const categoryDistribution = data?.categoryDistribution || [
-    { name: 'Plumbing', value: 3 },
-    { name: 'Electrical', value: 2 },
-    { name: 'Elevator', value: 2 }
-  ];
+  const pinnedNotices = data?.pinnedNotices || [];
+  const recentComplaints = data?.recentComplaints || [];
+  const categoryDistribution = data?.categoryDistribution || [];
 
   return (
-    <div className="space-y-8 pb-16 font-sans text-slate-100">
-      {/* 1. CARESYNC AI-STYLE TOP WELCOME & TELEMETRY HERO CARD */}
-      <div className="relative p-6 sm:p-8 bg-gradient-to-r from-blue-950/80 via-slate-900/90 to-cyan-950/70 border border-cyan-500/30 rounded-3xl backdrop-blur-xl shadow-[0_0_30px_rgba(6,182,212,0.12)] overflow-hidden">
-        {/* Glow ambient circle */}
-        <div className="absolute -right-20 -top-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/80 border border-cyan-500/40 text-[11px] font-mono text-cyan-300">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-              <span>FACILITY TELEMETRY IS ACTIVE · TOWERS A & B</span>
-            </div>
-
-            <h1 className="text-2xl sm:text-3xl font-bold font-sans tracking-tight text-white">
-              Hello, {user?.name || 'Secretary Elena Vance'} 👋
+    <div className="space-y-10 pb-16 font-sans text-[#16233D]">
+      {/* 1. Direct, Human Top Bar with Single Decisive Accent CTA */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#CBD3DD] pb-6">
+        <div>
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="text-xl sm:text-2xl font-bold font-sans tracking-tight text-[#16233D]">
+              {isStaffOrAdmin ? 'Greenwood Heights, live.' : 'My Home & Society Services'}
             </h1>
-
-            <p className="text-xs sm:text-sm text-slate-300 font-sans leading-relaxed">
-              {isStaffOrAdmin
-                ? 'Real-time building elevation digital twin, exponential defect decay risk analytics, and smart work orders dispatch.'
-                : 'Welcome to your flat maintenance portal. Report issues with 1-click photos and review society dues.'}
-            </p>
-
-            {/* Quick Action Buttons Pill Row */}
-            <div className="flex flex-wrap items-center gap-2.5 pt-2">
-              <button
-                onClick={() => onOpenCreateTicket && onOpenCreateTicket(user?.unitNumber)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 active:scale-98 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-[0_0_15px_rgba(37,99,235,0.4)]"
-              >
-                <Plus className="w-4 h-4 text-white" />
-                <span>{isStaffOrAdmin ? 'New Maintenance Ticket' : 'Report Flat Problem'}</span>
-              </button>
-
-              {isStaffOrAdmin && (
-                <button
-                  onClick={() => onNavigateTab('risk-analytics')}
-                  className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition-all cursor-pointer"
-                >
-                  <Flame className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Risk Decay Sliders</span>
-                </button>
-              )}
-
-              <button
-                onClick={() => onNavigateTab('billing')}
-                className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition-all cursor-pointer"
-              >
-                <CreditCard className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Maintenance Ledger</span>
-              </button>
-
-              <button
-                onClick={handleRefresh}
-                disabled={refreshing}
-                title="Refresh Live Telemetry"
-                className="p-2 bg-slate-900/90 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white rounded-xl transition-colors cursor-pointer"
-              >
-                <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin text-cyan-400' : ''}`} />
-              </button>
-            </div>
+            <span className="text-xs font-mono px-2 py-0.5 border border-[#CBD3DD] bg-white text-[#16233D]">
+              Towers A & B
+            </span>
           </div>
 
-          {/* Right Two Big Metric Cards (CareSync AI Style) */}
-          <div className="grid grid-cols-2 gap-3.5 sm:gap-4 shrink-0">
-            <div className="p-4 bg-slate-950/80 border border-slate-800 rounded-2xl text-center space-y-1 min-w-[120px] shadow-md">
-              <div className="text-2xl font-mono font-bold text-cyan-400">
-                {kpi.activeComplaints ?? 3}
-              </div>
-              <div className="text-[10px] font-mono uppercase text-slate-400 tracking-wider">
-                ACTIVE REPAIRS
-              </div>
-            </div>
-
-            <div className="p-4 bg-slate-950/80 border border-slate-800 rounded-2xl text-center space-y-1 min-w-[120px] shadow-md">
-              <div className="text-2xl font-mono font-bold text-emerald-400">
-                24
-              </div>
-              <div className="text-[10px] font-mono uppercase text-slate-400 tracking-wider">
-                UNITS MONITORED
-              </div>
-            </div>
+          {/* Ambient Real-time Status Strip */}
+          <div className="mt-2 flex flex-wrap items-center gap-3 text-xs font-mono">
+            {isStaffOrAdmin ? (
+              <>
+                <span className="inline-flex items-center gap-1.5 text-[#16233D] font-bold">
+                  <span className="w-2 h-2 bg-[#16233D] rounded-full" />
+                  {kpi.activeComplaints ?? 3} active repairs ({kpi.openComplaints ?? 1} open, {kpi.inProgressComplaints ?? 2} in progress)
+                </span>
+                <span className="text-[#CBD3DD]">·</span>
+                <span className={`inline-flex items-center gap-1.5 font-bold ${(kpi.overdueComplaints ?? 1) > 0 ? 'text-[#C6433D]' : 'text-[#2E8B63]'}`}>
+                  <span className={`w-2 h-2 ${(kpi.overdueComplaints ?? 1) > 0 ? 'bg-[#C6433D]' : 'bg-[#2E8B63]'}`} />
+                  {kpi.overdueComplaints ?? 1} overdue SLA
+                </span>
+                <span className="text-[#CBD3DD]">·</span>
+                <span className="inline-flex items-center gap-1.5 text-[#E8891C] font-bold">
+                  <span className="w-2 h-2 bg-[#E8891C] rounded-full" />
+                  {kpi.highRiskClustersCount ?? 3} defect clusters (1 critical)
+                </span>
+                <span className="text-[#CBD3DD]">·</span>
+                <span className="inline-flex items-center gap-1.5 text-[#2E8B63] font-bold">
+                  <span className="w-2 h-2 bg-[#2E8B63]" />
+                  {kpi.resolutionRate ?? 57}% resolved this cycle
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="inline-flex items-center gap-1.5 text-[#2E8B63] font-bold">
+                  <span className="w-2 h-2 bg-[#2E8B63]" />
+                  All building utilities operating normally
+                </span>
+                <span className="text-[#CBD3DD]">·</span>
+                <span className="inline-flex items-center gap-1.5 text-[#16233D]">
+                  {kpi.activeComplaints ?? 3} active repairs on campus
+                </span>
+                <span className="text-[#CBD3DD]">·</span>
+                <span className="inline-flex items-center gap-1.5 text-[#2E8B63]">
+                  August dues paid
+                </span>
+              </>
+            )}
           </div>
+        </div>
+
+        {/* Action Controls */}
+        <div className="flex items-center gap-3 self-start md:self-auto">
+          <button
+            onClick={() => onOpenCreateTicket && onOpenCreateTicket(selectedUnit || user?.unitNumber)}
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#E8891C] hover:bg-[#d97d15] active:scale-98 text-[#16233D] text-xs font-bold transition-all cursor-pointer shadow-sm"
+          >
+            <Plus className="w-4 h-4 text-[#16233D]" />
+            <span>{isStaffOrAdmin ? 'New Maintenance Ticket' : 'Report Issue in Flat'}</span>
+          </button>
+
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="p-2.5 bg-white hover:bg-slate-50 border border-[#CBD3DD] text-[#16233D] transition-colors cursor-pointer"
+            title="Refresh Live Data"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[#16233D]' : 'text-[#6E7C90]'}`} />
+          </button>
         </div>
       </div>
 
-      {/* 2. LIVING BUILDING ELEVATION DIGITAL TWIN */}
+      {/* 2. HERO: DOMINANT LIVING BUILDING ELEVATION (Admin/Staff) OR RESIDENT HEALTH (Resident) */}
       {isStaffOrAdmin ? (
         <BuildingSchematicMap
           riskClusters={riskAnalytics.clusters || []}
@@ -190,9 +165,9 @@ export const Dashboard = ({ onNavigateTab, onSelectComplaint, onOpenCreateTicket
         />
       )}
 
-      {/* 3. ASYMMETRIC STREAM: Work Orders vs Connected Risk & Categories */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Work Orders Timeline (Cols 1-8) */}
+      {/* 3. ASYMMETRIC SECONDARY SECTION: Work Orders (70%) vs Risk Detail & Bulletins (30%) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* Primary Stream: Chronological Work Orders & Dispatch Log (Cols 1-8) */}
         <div className="lg:col-span-8">
           <WorkOrdersTimeline
             complaints={recentComplaints}
@@ -202,8 +177,9 @@ export const Dashboard = ({ onNavigateTab, onSelectComplaint, onOpenCreateTicket
           />
         </div>
 
-        {/* Secondary Stream: Connected Risk Curve & Distribution (Cols 9-12) */}
+        {/* Secondary Stream: Connected Risk Curve, Category Load & Society Bulletins (Cols 9-12) */}
         <div className="lg:col-span-4 space-y-6">
+          {/* Connected Risk Trajectory Detail */}
           {isStaffOrAdmin && (
             <ConnectedRiskPlot
               selectedUnit={selectedUnit}
@@ -214,19 +190,19 @@ export const Dashboard = ({ onNavigateTab, onSelectComplaint, onOpenCreateTicket
             />
           )}
 
-          {/* Active System Load Card */}
-          {isStaffOrAdmin && (
-            <div className="bg-[#0B1220]/90 border border-slate-800 p-5 font-sans rounded-3xl backdrop-blur-xl shadow-xl space-y-3.5">
-              <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+          {/* Active System Repair Load Card (Admin/Staff) */}
+          {isStaffOrAdmin && categoryDistribution.length > 0 && (
+            <div className="bg-white border border-[#CBD3DD] p-5 font-sans shadow-xs space-y-3">
+              <div className="flex items-center justify-between border-b border-[#E4E8EE] pb-3">
                 <div className="flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-cyan-400" />
-                  <h4 className="text-xs font-bold font-mono uppercase tracking-wider text-white">
-                    Defect Category Load
+                  <Activity className="w-3.5 h-3.5 text-[#16233D]" />
+                  <h4 className="text-xs font-bold font-sans uppercase tracking-wider text-[#16233D]">
+                    Active System Load
                   </h4>
                 </div>
                 <button
                   onClick={() => onNavigateTab('risk-analytics')}
-                  className="text-[11px] font-mono text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-0.5 cursor-pointer"
+                  className="text-[11px] font-sans text-[#16233D] hover:text-[#E8891C] font-semibold flex items-center gap-0.5 cursor-pointer"
                 >
                   <span>Forecast</span>
                   <ArrowUpRight className="w-3 h-3" />
@@ -235,18 +211,18 @@ export const Dashboard = ({ onNavigateTab, onSelectComplaint, onOpenCreateTicket
 
               <div className="space-y-2.5">
                 {categoryDistribution.map((item) => (
-                  <div key={item.name} className="flex items-center justify-between text-xs p-2 rounded-xl bg-slate-950/60 border border-slate-800/60">
-                    <span className="font-medium text-slate-200">{item.name}</span>
+                  <div key={item.name} className="flex items-center justify-between text-xs">
+                    <span className="font-medium text-[#16233D]">{item.name}</span>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-[11px] text-cyan-300">
+                      <span className="font-mono text-[11px] text-[#6E7C90]">
                         {item.value} ticket(s)
                       </span>
-                      <span className={`w-2.5 h-2.5 rounded-full ${
+                      <span className={`w-2 h-2 rounded-full ${
                         item.name === 'Plumbing'
-                          ? 'bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.7)]'
+                          ? 'bg-[#C6433D]'
                           : item.name === 'Electrical'
-                          ? 'bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,0.7)]'
-                          : 'bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.7)]'
+                          ? 'bg-[#E8891C]'
+                          : 'bg-[#16233D]'
                       }`} />
                     </div>
                   </div>
@@ -254,6 +230,92 @@ export const Dashboard = ({ onNavigateTab, onSelectComplaint, onOpenCreateTicket
               </div>
             </div>
           )}
+
+          {/* Quick Resident Actions if viewing as resident */}
+          {!isStaffOrAdmin && (
+            <SchematicPanel
+              header="Quick Resident Actions"
+              headerSub="One-tap access to services"
+            >
+              <div className="space-y-2 text-xs">
+                <button
+                  onClick={() => onNavigateTab('billing')}
+                  className="w-full p-3 bg-[#F7F9FB] hover:bg-[#EEF2F6] border border-[#CBD3DD] flex items-center justify-between text-left transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <CreditCard className="w-4 h-4 text-[#16233D]" />
+                    <div>
+                      <div className="font-bold text-[#16233D] font-sans">Maintenance Dues</div>
+                      <div className="text-[11px] text-[#6E7C90]">August 2026 invoice ready</div>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-[#6E7C90]" />
+                </button>
+
+                <button
+                  onClick={() => onOpenCreateTicket && onOpenCreateTicket(user?.unitNumber)}
+                  className="w-full p-3 bg-[#F7F9FB] hover:bg-[#EEF2F6] border border-[#CBD3DD] flex items-center justify-between text-left transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Plus className="w-4 h-4 text-[#E8891C]" />
+                    <div>
+                      <div className="font-bold text-[#16233D] font-sans">Report Maintenance Problem</div>
+                      <div className="text-[11px] text-[#6E7C90]">Plumbing, Electrical, Lift</div>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-[#6E7C90]" />
+                </button>
+              </div>
+            </SchematicPanel>
+          )}
+
+          {/* Society Bulletins */}
+          <div className="bg-white border border-[#CBD3DD] p-5 font-sans shadow-xs">
+            <div className="flex items-center justify-between border-b border-[#E4E8EE] pb-3 mb-3">
+              <div className="flex items-center gap-2">
+                <Bell className="w-3.5 h-3.5 text-[#16233D]" />
+                <h4 className="text-xs font-bold font-sans uppercase tracking-wider text-[#16233D]">
+                  Society Bulletins
+                </h4>
+              </div>
+              <button
+                onClick={() => onNavigateTab('notices')}
+                className="text-xs font-sans text-[#16233D] hover:text-[#E8891C] font-semibold cursor-pointer"
+              >
+                View All
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {pinnedNotices.length > 0 ? (
+                pinnedNotices.map((notice) => (
+                  <div
+                    key={notice._id}
+                    className="p-3 bg-[#F7F9FB] border border-[#CBD3DD] space-y-1.5"
+                  >
+                    <div className="flex items-center justify-between text-[10px] font-sans">
+                      <span className="font-bold text-[#16233D] uppercase border border-[#CBD3DD] bg-white px-1.5 py-0.2">
+                        {notice.category}
+                      </span>
+                      <span className="text-[#6E7C90] font-mono">
+                        {new Date(notice.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <h5 className="text-xs font-bold font-sans text-[#16233D] leading-snug">
+                      {notice.title}
+                    </h5>
+                    <p className="text-[11px] font-sans text-[#6E7C90] line-clamp-2 leading-relaxed">
+                      {notice.content}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs font-sans text-[#6E7C90] text-center py-3">
+                  No active circulars.
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

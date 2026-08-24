@@ -6,8 +6,7 @@ import {
   ChevronRight,
   List,
   Calendar,
-  CheckCircle2,
-  Sparkles
+  CheckCircle2
 } from 'lucide-react';
 
 export const WorkOrdersTimeline = ({
@@ -46,160 +45,237 @@ export const WorkOrdersTimeline = ({
   };
 
   return (
-    <div className="bg-[#0B1220]/90 border border-slate-800 p-5 sm:p-7 font-sans text-slate-100 rounded-3xl backdrop-blur-xl shadow-xl space-y-5">
+    <div className="bg-white border border-[#CBD3DD] p-4 sm:p-5 font-sans text-[#16233D]">
       {/* Header with View Mode Toggle */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E4E8EE] pb-3.5 mb-4">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="font-bold text-sm text-white tracking-wide uppercase font-mono flex items-center gap-2">
-              <List className="w-4 h-4 text-cyan-400" />
-              Active Work Orders & Maintenance Stream
+            <span className="w-2 h-2 bg-[#16233D]" />
+            <h3 className="text-xs font-bold font-sans uppercase tracking-wider text-[#16233D]">
+              WORK ORDERS & DISPATCH LOG
             </h3>
-            {selectedUnit && (
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950 border border-cyan-500/40 text-cyan-300">
-                Filtered: {selectedUnit}
+            {selectedUnit ? (
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-[#16233D] text-[#EEF2F6]">
+                UNIT: {selectedUnit.toUpperCase()} ({filteredComplaints.length})
+              </span>
+            ) : (
+              <span className="text-[10px] font-mono px-1.5 py-0.2 border border-[#CBD3DD] bg-[#F7F9FB] text-[#6E7C90]">
+                TOTAL: {filteredComplaints.length} WORK ORDERS
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Real-time status updates and contractor dispatch pipeline.
+          <p className="text-[11px] font-sans text-[#6E7C90] mt-0.5">
+            Chronological maintenance event stream ordered by turnaround priority.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          {/* View Mode Toggle */}
-          <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+        <div className="flex items-center gap-2">
+          {/* Timeline / Table Switcher */}
+          <div className="flex items-center bg-[#F7F9FB] border border-[#CBD3DD] p-0.5 text-xs font-mono">
             <button
               onClick={() => setViewMode('timeline')}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              className={`px-2.5 py-1 flex items-center gap-1.5 text-[10px] uppercase font-bold transition-all cursor-pointer ${
                 viewMode === 'timeline'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-[#16233D] text-[#EEF2F6]'
+                  : 'text-[#6E7C90] hover:text-[#16233D]'
               }`}
             >
-              Timeline
+              <Calendar className="w-3 h-3" />
+              <span>Timeline Log</span>
             </button>
             <button
               onClick={() => setViewMode('table')}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              className={`px-2.5 py-1 flex items-center gap-1.5 text-[10px] uppercase font-bold transition-all cursor-pointer ${
                 viewMode === 'table'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-[#16233D] text-[#EEF2F6]'
+                  : 'text-[#6E7C90] hover:text-[#16233D]'
               }`}
             >
-              Table
+              <List className="w-3 h-3" />
+              <span>Table Grid</span>
             </button>
           </div>
 
           <button
             onClick={onViewAllRegistry}
-            className="text-xs font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 transition-colors px-2 py-1 cursor-pointer"
+            className="text-xs font-sans text-[#16233D] hover:text-[#E8A33D] font-semibold flex items-center gap-1 cursor-pointer pl-1"
           >
-            <span>All Tickets ({complaints.length})</span>
+            <span>Registry</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      {/* Primary Timeline Feed */}
-      {viewMode === 'timeline' ? (
-        <div className="space-y-3">
-          {filteredComplaints.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 text-xs bg-slate-950/60 rounded-2xl border border-slate-800">
-              No active tickets found for this filter.
-            </div>
-          ) : (
-            filteredComplaints.map((c) => {
-              const isOverdue = getIsOverdue(c);
-              const remainingHours = getRemainingHours(c);
+      {/* Content */}
+      {filteredComplaints.length === 0 ? (
+        <div className="p-8 text-center bg-[#F7F9FB] border border-[#CBD3DD]">
+          <CheckCircle2 className="w-8 h-8 text-[#2E8B63] mx-auto mb-2" />
+          <h4 className="text-xs font-bold font-sans uppercase text-[#16233D]">
+            NO DEFECT WORK ORDERS LOGGED
+          </h4>
+          <p className="text-[11px] font-sans text-[#6E7C90] mt-0.5">
+            {selectedUnit
+              ? `No active or historical maintenance complaints recorded for ${selectedUnit}.`
+              : 'All building facilities nominal. No active complaints.'}
+          </p>
+        </div>
+      ) : viewMode === 'timeline' ? (
+        /* CHRONOLOGICAL TIMELINE VIEW */
+        <div className="relative pl-6 space-y-3.5 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-[2px] before:bg-[#CBD3DD]">
+          {filteredComplaints.map((c) => {
+            const dateStr = new Date(c.createdAt).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric'
+            });
+            const isOverdue = getIsOverdue(c);
+            const remainingHours = getRemainingHours(c);
 
-              return (
-                <div
-                  key={c._id}
-                  onClick={() => onSelectComplaint && onSelectComplaint(c._id)}
-                  className={`p-4 bg-slate-950/80 hover:bg-slate-900 border rounded-2xl transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-3 group shadow-md ${
+            return (
+              <div
+                key={c._id}
+                onClick={() => onSelectComplaint && onSelectComplaint(c._id)}
+                className="relative group cursor-pointer"
+              >
+                {/* Clean Circular Timeline Node Dot */}
+                <span
+                  className={`absolute -left-[20px] top-3.5 w-2.5 h-2.5 rounded-full border-2 bg-white ${
                     isOverdue
-                      ? 'border-rose-500/60 shadow-[0_0_15px_rgba(239,68,68,0.15)]'
-                      : 'border-slate-800/90 hover:border-cyan-500/40'
+                      ? 'border-[#C6433D] bg-[#C6433D]'
+                      : c.currentStatus === 'In Progress'
+                      ? 'border-[#E8A33D] bg-[#E8A33D]'
+                      : c.currentStatus === 'Resolved'
+                      ? 'border-[#2E8B63] bg-[#2E8B63]'
+                      : 'border-[#16233D] bg-[#16233D]'
                   }`}
-                >
-                  <div className="space-y-1.5 min-w-0 flex-1">
-                    <div className="flex items-center gap-2.5 flex-wrap">
-                      <span className="text-[11px] font-mono px-2 py-0.5 rounded-md bg-slate-900 border border-slate-700 text-cyan-300 font-bold">
+                />
+
+                {/* Entry Card */}
+                <div className="p-3 bg-[#F7F9FB] hover:bg-white border border-[#CBD3DD] hover:border-[#16233D] transition-all">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[10px] font-bold text-[#16233D] bg-white px-1.5 py-0.5 border border-[#CBD3DD]">
+                        #{c._id.slice(-6).toUpperCase()}
+                      </span>
+                      <span className="font-mono font-bold text-xs bg-[#16233D] text-[#EEF2F6] px-1.5 py-0.5">
                         {c.unitNumber}
                       </span>
-                      <h4 className="text-xs font-bold text-white group-hover:text-cyan-300 transition-colors truncate">
+                      <span className="text-xs font-bold font-sans text-[#16233D]">
                         {c.title}
-                      </h4>
+                      </span>
                     </div>
 
-                    <p className="text-[11px] text-slate-400 line-clamp-1">
-                      {c.description}
-                    </p>
-
-                    <div className="flex items-center gap-3 text-[10px] font-mono text-slate-500 pt-0.5">
-                      <span>Category: <strong className="text-slate-300">{c.category}</strong></span>
-                      <span>·</span>
-                      <span>Resident: <strong className="text-slate-300">{c.resident?.name || 'Arthur Pendelton'}</strong></span>
+                    <div className="flex items-center gap-2">
+                      <StatusBadge status={c.currentStatus} />
+                      <PriorityBadge priority={c.priority} />
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
-                    {isOverdue ? (
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-rose-950/80 text-rose-300 border border-rose-500/60 flex items-center gap-1">
-                        <AlertTriangle className="w-3 h-3 text-rose-400" />
-                        OVERDUE SLA
-                      </span>
-                    ) : remainingHours > 0 ? (
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-mono text-cyan-300 bg-cyan-950/60 border border-cyan-500/30 flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-cyan-400" />
-                        {remainingHours}h SLA left
-                      </span>
-                    ) : null}
+                  <div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] font-sans text-[#6E7C90] pt-1.5 border-t border-[#E4E8EE]">
+                    <div>
+                      <span className="font-semibold text-[#16233D]">CATEGORY:</span> {c.category?.toUpperCase()} · LOGGED ON: <span className="font-mono">{dateStr}</span>
+                    </div>
 
-                    <StatusBadge status={c.currentStatus} />
-                    <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
+                    <div className="font-mono text-[11px]">
+                      {isOverdue ? (
+                        <span className="inline-flex items-center gap-1 font-bold text-[#C6433D]">
+                          <AlertTriangle className="w-3 h-3" />
+                          OVERDUE SLA
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[#16233D]">
+                          <Clock className="w-3 h-3 text-[#6E7C90]" />
+                          {remainingHours}h remaining
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              );
-            })
-          )}
+              </div>
+            );
+          })}
         </div>
       ) : (
-        /* Table View */
-        <div className="overflow-x-auto rounded-2xl border border-slate-800">
-          <table className="w-full text-left text-xs font-sans text-slate-300">
-            <thead className="bg-slate-950 text-[10px] font-mono uppercase text-slate-400 border-b border-slate-800">
+        /* TABLE VIEW */
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-[#F7F9FB] text-[#6E7C90] uppercase tracking-wider text-[10px] font-mono border-b border-[#CBD3DD]">
               <tr>
-                <th className="p-3">Unit</th>
-                <th className="p-3">Title</th>
-                <th className="p-3">Category</th>
-                <th className="p-3">Priority</th>
-                <th className="p-3">Status</th>
-                <th className="p-3">SLA</th>
+                <th className="px-4 py-2.5">TICKET / SUMMARY</th>
+                <th className="px-4 py-2.5">UNIT_LOCATION</th>
+                <th className="px-4 py-2.5">STATUS</th>
+                <th className="px-4 py-2.5">PRIORITY</th>
+                <th className="px-4 py-2.5">SLA_WINDOW</th>
+                <th className="px-4 py-2.5 text-right">ACTION</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/80 bg-slate-900/60">
-              {filteredComplaints.map((c) => (
-                <tr
-                  key={c._id}
-                  onClick={() => onSelectComplaint && onSelectComplaint(c._id)}
-                  className="hover:bg-slate-800/70 transition-colors cursor-pointer"
-                >
-                  <td className="p-3 font-mono font-bold text-cyan-300">{c.unitNumber}</td>
-                  <td className="p-3 font-semibold text-white truncate max-w-xs">{c.title}</td>
-                  <td className="p-3 text-slate-400">{c.category}</td>
-                  <td className="p-3"><PriorityBadge priority={c.priority} /></td>
-                  <td className="p-3"><StatusBadge status={c.currentStatus} /></td>
-                  <td className="p-3 font-mono text-[11px] text-slate-400">
-                    {getIsOverdue(c) ? (
-                      <span className="text-rose-400 font-bold">Overdue</span>
-                    ) : (
-                      `${getRemainingHours(c)}h`
-                    )}
-                  </td>
-                </tr>
-              ))}
+            <tbody className="divide-y divide-[#E4E8EE]">
+              {filteredComplaints.map((c) => {
+                const isOverdue = getIsOverdue(c);
+                const remainingHours = getRemainingHours(c);
+
+                return (
+                  <tr
+                    key={c._id}
+                    onClick={() => onSelectComplaint && onSelectComplaint(c._id)}
+                    className="hover:bg-[#F7F9FB] cursor-pointer transition-colors"
+                  >
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-[10px] font-bold text-[#16233D] bg-[#F7F9FB] px-1 py-0.2 border border-[#CBD3DD]">
+                          #{c._id.slice(-6).toUpperCase()}
+                        </span>
+                        <span className="font-sans font-semibold text-[#16233D] line-clamp-1">
+                          {c.title}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-[#6E7C90] font-mono mt-0.5">
+                        {c.category?.toUpperCase()} · {new Date(c.createdAt).toLocaleDateString()}
+                      </div>
+                    </td>
+
+                    <td className="px-4 py-3 font-mono font-bold text-[#16233D] text-[11px]">
+                      <span className="px-1.5 py-0.5 border border-[#CBD3DD] bg-[#F7F9FB]">
+                        {c.unitNumber}
+                      </span>
+                    </td>
+
+                    <td className="px-4 py-3">
+                      <StatusBadge status={c.currentStatus} />
+                    </td>
+
+                    <td className="px-4 py-3">
+                      <PriorityBadge priority={c.priority} />
+                    </td>
+
+                    <td className="px-4 py-3 font-mono text-[11px]">
+                      {isOverdue ? (
+                        <span className="inline-flex items-center gap-1 text-[#C6433D] font-bold">
+                          <AlertTriangle className="w-3 h-3" />
+                          OVERDUE
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[#16233D]">
+                          <Clock className="w-3 h-3 text-[#6E7C90]" />
+                          {remainingHours}h left
+                        </span>
+                      )}
+                    </td>
+
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectComplaint && onSelectComplaint(c._id);
+                        }}
+                        className="px-2.5 py-1 border border-[#CBD3DD] bg-white hover:bg-[#16233D] hover:text-white text-[#16233D] transition-colors text-[11px] font-mono font-semibold cursor-pointer"
+                      >
+                        INSPECT
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

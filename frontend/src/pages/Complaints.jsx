@@ -15,9 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
-  User,
-  List,
-  Sparkles
+  User
 } from 'lucide-react';
 
 export const Complaints = ({ initialSelectedComplaintId, externalSearchQuery }) => {
@@ -34,242 +32,351 @@ export const Complaints = ({ initialSelectedComplaintId, externalSearchQuery }) 
   const [searchQuery, setSearchQuery] = useState(externalSearchQuery || '');
   const [isOverdueOnly, setIsOverdueOnly] = useState(false);
   const [myOnly, setMyOnly] = useState(false);
+  const [categories, setCategories] = useState([]);
 
-  // Quick categories for CareSync-style filter pills
-  const quickCategories = [
-    { label: 'All Tickets', value: 'All' },
-    { label: 'Plumbing 💧', value: 'Plumbing' },
-    { label: 'Electrical ⚡', value: 'Electrical' },
-    { label: 'Elevator 🛗', value: 'Elevator' },
-    { label: 'Civil 🏢', value: 'Civil' }
-  ];
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ total: 0, totalPages: 1 });
+
+  const fetchCategories = async () => {
+    try {
+      const res = await api.get('/settings');
+      setCategories(res.data?.settings || []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchComplaints = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/complaints');
-      let items = Array.isArray(res.data) ? res.data : (res.data?.items || res.data?.complaints || []);
-      
-      // Filter in client
-      if (statusFilter !== 'All') {
-        items = items.filter(c => c.currentStatus === statusFilter);
-      }
-      if (categoryFilter !== 'All') {
-        items = items.filter(c => c.category === categoryFilter);
-      }
-      if (isOverdueOnly) {
-        items = items.filter(c => c.isOverdue || (c.dueDate && new Date(c.dueDate) < new Date() && !['Resolved', 'Closed'].includes(c.currentStatus)));
-      }
-      if (myOnly && user?.unitNumber) {
-        items = items.filter(c => c.unitNumber === user?.unitNumber);
-      }
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        items = items.filter(c => 
-          c.title?.toLowerCase().includes(q) || 
-          c.description?.toLowerCase().includes(q) || 
-          c.unitNumber?.toLowerCase().includes(q)
-        );
-      }
+      const params = {
+        page,
+        limit: 15,
+        status: statusFilter !== 'All' ? statusFilter : undefined,
+        category: categoryFilter !== 'All' ? categoryFilter : undefined,
+        search: searchQuery || undefined,
+        isOverdue: isOverdueOnly ? 'true' : undefined,
+        myOnly: myOnly ? 'true' : undefined
+      };
 
-      setComplaints(items);
+      const res = await api.get('/complaints', { params });
+      setComplaints(res.data?.items || []);
+      setPagination(res.data?.pagination || { total: 0, totalPages: 1 });
+
+      if (initialSelectedComplaintId) {
+        const found = (res.data?.items || []).find((c) => c._id === initialSelectedComplaintId);
+        if (found) setSelectedComplaint(found);
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Failed to load complaints', err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchComplaints();
-  }, [statusFilter, categoryFilter, searchQuery, isOverdueOnly, myOnly]);
+    if (externalSearchQuery !== undefined) {
+      setSearchQuery(externalSearchQuery);
+    }
+  }, [externalSearchQuery]);
 
-  const handleOpenDetail = (complaint) => {
-    setSelectedComplaint(complaint);
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    fetchComplaints();
+  }, [statusFilter, categoryFilter, searchQuery, isOverdueOnly, myOnly, page]);
+
+  const handleOpenDetail = async (complaint) => {
+    try {
+      const res = await api.get(`/complaints/${complaint._id}`);
+      setSelectedComplaint(res.data);
+    } catch {
+      setSelectedComplaint(complaint);
+    }
   };
 
   return (
-    <div className="space-y-6 pb-16 font-sans text-slate-100">
-      {/* 1. Header Card */}
-      <div className="p-6 bg-[#0B1220]/90 border border-slate-800 rounded-3xl backdrop-blur-xl shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6 pb-12 font-sans text-[#16233D]">
+      {/* Header */}
+      <div className="relative bg-white border border-[#CBD3DD] p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Corner Drafting Marks */}
+        <span className="absolute -top-[1px] -left-[1px] w-2 h-2 border-t-2 border-l-2 border-[#16233D] pointer-events-none" />
+        <span className="absolute -top-[1px] -right-[1px] w-2 h-2 border-t-2 border-r-2 border-[#16233D] pointer-events-none" />
+        <span className="absolute -bottom-[1px] -left-[1px] w-2 h-2 border-b-2 border-l-2 border-[#16233D] pointer-events-none" />
+        <span className="absolute -bottom-[1px] -right-[1px] w-2 h-2 border-b-2 border-r-2 border-[#16233D] pointer-events-none" />
+
         <div>
-          <div className="flex items-center gap-2">
-            <List className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-lg font-bold font-sans text-white uppercase tracking-tight">
-              {user?.role === 'resident' ? 'My Requests & Maintenance Complaints' : 'Work Orders & Maintenance Registry'}
-            </h2>
-          </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Track maintenance tickets from submission to resolution with verified audit logs and SLA timers.
+          <h2 className="text-lg font-bold font-sans text-[#16233D] uppercase tracking-tight">
+            {user?.role === 'resident' ? 'My Requests & Maintenance Complaints' : 'Work Orders & Maintenance Registry'}
+          </h2>
+          <p className="text-xs font-sans text-[#6E7C90] mt-0.5">
+            Track your maintenance requests from submission to on-site resolution with verified audit logs
           </p>
         </div>
 
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl transition-all self-start sm:self-auto cursor-pointer shadow-[0_0_15px_rgba(37,99,235,0.4)]"
+          className="flex items-center gap-1.5 px-4 py-2 bg-[#16233D] hover:bg-[#253556] text-white text-xs font-sans font-bold transition-colors self-start sm:self-auto cursor-pointer border border-[#16233D]"
         >
-          <Plus className="w-4 h-4 text-white" />
+          <Plus className="w-4 h-4 text-[#E8A33D]" />
           <span>{user?.role === 'resident' ? 'Report a Maintenance Issue' : 'Raise New Work Order'}</span>
         </button>
       </div>
 
-      {/* 2. CARESYNC AI-STYLE QUICK FILTER PILLS */}
-      <div className="flex items-center gap-2 flex-wrap text-xs">
-        <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider mr-1">QUICK FILTERS:</span>
-        {quickCategories.map((cat) => {
-          const isSelected = categoryFilter === cat.value;
-          return (
-            <button
-              key={cat.value}
-              onClick={() => setCategoryFilter(cat.value)}
-              className={`px-3 py-1.5 rounded-xl font-semibold transition-all cursor-pointer ${
-                isSelected
-                  ? 'bg-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.5)] border border-blue-400/40 font-bold'
-                  : 'bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800 hover:border-slate-700'
-              }`}
-            >
-              {cat.label}
-            </button>
-          );
-        })}
-
-        <button
-          onClick={() => setIsOverdueOnly(!isOverdueOnly)}
-          className={`ml-auto px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-            isOverdueOnly
-              ? 'bg-rose-950 text-rose-300 border border-rose-500 shadow-[0_0_12px_rgba(239,68,68,0.3)]'
-              : 'bg-slate-900/90 text-slate-400 hover:text-white border border-slate-800'
-          }`}
-        >
-          <AlertCircle className="w-3.5 h-3.5 text-rose-400" />
-          <span>Overdue SLA Only</span>
-        </button>
-      </div>
-
-      {/* 3. Search & Status Filter Bar */}
-      <div className="p-4 bg-[#0B1220]/90 border border-slate-800 rounded-2xl backdrop-blur-xl shadow-lg space-y-3">
-        {/* Status Pills */}
-        <div className="flex flex-wrap items-center gap-1.5 border-b border-slate-800/80 pb-3">
+      {/* Filters Bar */}
+      <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs space-y-3">
+        {/* Status Segmented Buttons */}
+        <div className="flex flex-wrap items-center gap-1.5 border-b border-slate-100 pb-3">
           {['All', 'Open', 'In Progress', 'Resolved', 'Closed'].map((st) => (
             <button
               key={st}
-              onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              onClick={() => {
+                setStatusFilter(st);
+                setPage(1);
+              }}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                 statusFilter === st
-                  ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/40 shadow-xs font-bold'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
               {st}
             </button>
           ))}
+
+          <button
+            onClick={() => {
+              setIsOverdueOnly(!isOverdueOnly);
+              setPage(1);
+            }}
+            className={`ml-auto px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 border transition-all ${
+              isOverdueOnly
+                ? 'bg-rose-50 text-rose-800 border-rose-300 ring-1 ring-rose-200'
+                : 'bg-white text-slate-600 border-slate-200 hover:text-slate-900'
+            }`}
+          >
+            <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
+            <span>Overdue SLA Only</span>
+          </button>
         </div>
 
-        {/* Search Input */}
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1">
+        {/* Search, Category, and Unit Checkbox */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div className="relative sm:col-span-2">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search complaint title, description, flat, or category..."
+              placeholder="Search complaint title, description, or unit..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3.5 py-2 bg-slate-950/80 border border-slate-700/80 rounded-xl text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/30 transition-all"
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setPage(1);
+              }}
+              className="w-full pl-9 pr-3.5 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:bg-white"
             />
           </div>
 
-          <button
-            onClick={fetchComplaints}
-            className="p-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-400 hover:text-white rounded-xl transition-colors cursor-pointer"
-            title="Refresh Complaints"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-cyan-400' : ''}`} />
-          </button>
+          <div>
+            <select
+              value={categoryFilter}
+              onChange={(e) => {
+                setCategoryFilter(e.target.value);
+                setPage(1);
+              }}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 font-medium focus:outline-none focus:border-blue-600 focus:bg-white"
+            >
+              <option value="All">All Categories</option>
+              {categories.map((c) => (
+                <option key={c.category} value={c.category}>
+                  {c.category}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center">
+            <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-800 font-bold">
+              <input
+                type="checkbox"
+                checked={myOnly}
+                onChange={(e) => {
+                  setMyOnly(e.target.checked);
+                  setPage(1);
+                }}
+                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
+              />
+              <span>My Flat Complaints Only</span>
+            </label>
+          </div>
         </div>
       </div>
 
-      {/* 4. Complaints List Feed */}
-      <div className="space-y-3">
-        {loading ? (
-          <div className="p-12 text-center text-slate-400 bg-slate-950/60 rounded-3xl border border-slate-800">
-            <RefreshCw className="w-6 h-6 animate-spin text-cyan-400 mx-auto mb-2" />
-            Loading work orders...
-          </div>
-        ) : complaints.length === 0 ? (
-          <div className="p-12 text-center text-slate-400 bg-slate-950/60 rounded-3xl border border-slate-800 space-y-2">
-            <p className="text-sm font-semibold text-slate-300">No complaints matching your filter.</p>
-            <p className="text-xs text-slate-500">Try adjusting your search criteria or clear active filters.</p>
-          </div>
-        ) : (
-          complaints.map((c) => (
-            <div
-              key={c._id}
-              onClick={() => handleOpenDetail(c)}
-              className="p-4 sm:p-5 bg-[#0B1220]/90 hover:bg-slate-900 border border-slate-800/90 hover:border-cyan-500/40 rounded-2xl transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 group shadow-md"
-            >
-              <div className="space-y-1.5 min-w-0 flex-1">
-                <div className="flex items-center gap-2.5 flex-wrap">
-                  <span className="text-[11px] font-mono font-bold px-2 py-0.5 rounded-md bg-slate-950 border border-slate-800 text-cyan-300">
-                    {c.unitNumber}
-                  </span>
-                  <h3 className="text-sm font-bold text-white group-hover:text-cyan-300 transition-colors">
-                    {c.title}
-                  </h3>
-                </div>
+      {/* Complaints Table */}
+      <div className="bg-white border border-slate-200 rounded-xl shadow-xs overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-slate-50 text-slate-600 uppercase tracking-wider text-[11px] font-bold border-b border-slate-200">
+              <tr>
+                <th className="px-4 py-3">Complaint & Category</th>
+                <th className="px-4 py-3">Flat / Unit Location</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Priority</th>
+                <th className="px-4 py-3">SLA Turnaround</th>
+                <th className="px-4 py-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100">
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-12 text-center text-slate-400">
+                    <RefreshCw className="w-5 h-5 animate-spin text-blue-600 mx-auto mb-2" />
+                    Loading complaints...
+                  </td>
+                </tr>
+              ) : complaints.length > 0 ? (
+                complaints.map((c) => (
+                  <tr
+                    key={c._id}
+                    onClick={() => handleOpenDetail(c)}
+                    className="hover:bg-slate-50 cursor-pointer transition-colors group"
+                  >
+                    <td className="px-4 py-3.5">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-blue-700 font-bold text-[11px] bg-blue-50 px-1.5 py-0.2 rounded border border-blue-100">
+                          #{c._id.slice(-6).toUpperCase()}
+                        </span>
+                        <span className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                          {c.title}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-2">
+                        <span className="font-semibold text-slate-700">{c.category}</span>
+                        <span>·</span>
+                        <span>{new Date(c.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </td>
 
-                <p className="text-xs text-slate-400 line-clamp-2">
-                  {c.description}
-                </p>
+                    <td className="px-4 py-3.5 font-bold text-slate-900">
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
+                        <span>{c.unitNumber}</span>
+                      </div>
+                      <div className="text-[11px] text-slate-400 font-normal">
+                        {c.resident?.name || 'Resident'}
+                      </div>
+                    </td>
 
-                <div className="flex items-center gap-3 text-[11px] font-mono text-slate-500 pt-1">
-                  <span>Category: <strong className="text-slate-300">{c.category}</strong></span>
-                  <span>·</span>
-                  <span>Reported by: <strong className="text-slate-300">{c.resident?.name || 'Arthur Pendelton'}</strong></span>
-                </div>
-              </div>
+                    <td className="px-4 py-3.5">
+                      <StatusBadge status={c.currentStatus} />
+                    </td>
 
-              <div className="flex items-center gap-3 shrink-0 self-end sm:self-auto">
-                <PriorityBadge priority={c.priority} />
-                <StatusBadge status={c.currentStatus} />
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleOpenDetail(c);
-                  }}
-                  className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-cyan-950 hover:text-cyan-300 text-xs font-bold text-slate-300 border border-slate-700 transition-colors flex items-center gap-1 cursor-pointer"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Inspect</span>
-                </button>
-              </div>
+                    <td className="px-4 py-3.5">
+                      <PriorityBadge priority={c.priority} />
+                    </td>
+
+                    <td className="px-4 py-3.5">
+                      {c.isOverdue ? (
+                        <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-rose-50 border border-rose-200 text-rose-800 text-[11px] font-bold">
+                          <AlertCircle className="w-3 h-3 text-rose-600" />
+                          <span>Overdue</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1 text-slate-700 text-[11px] font-mono font-medium">
+                          <Clock className="w-3 h-3 text-blue-600" />
+                          <span>{c.remainingHours}h remaining</span>
+                        </div>
+                      )}
+                    </td>
+
+                    <td className="px-4 py-3.5 text-right">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDetail(c);
+                        }}
+                        className="px-3 py-1.5 rounded bg-slate-100 hover:bg-blue-600 text-slate-700 hover:text-white transition-colors text-xs font-bold inline-flex items-center gap-1"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Open</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-6 py-12 text-center">
+                    <div className="max-w-sm mx-auto flex flex-col items-center justify-center space-y-3">
+                      <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-500 border border-slate-200 flex items-center justify-center shadow-xs">
+                        <AlertCircle className="w-6 h-6 text-slate-400" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-900">
+                          No Maintenance Complaints Found
+                        </h4>
+                        <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                          No matching records found for the selected filter or search criteria.
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setIsCreateModalOpen(true)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer mt-1"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Raise New Complaint</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {pagination.totalPages > 1 && (
+          <div className="px-4 py-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span className="font-semibold text-slate-700">
+              Showing {complaints.length} of {pagination.total} complaints
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                disabled={page <= 1}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                className="p-1.5 rounded bg-slate-100 disabled:opacity-30 hover:bg-slate-200 text-slate-800"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <span className="font-mono font-bold text-blue-900">
+                Page {page} / {pagination.totalPages}
+              </span>
+              <button
+                disabled={page >= pagination.totalPages}
+                onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
+                className="p-1.5 rounded bg-slate-100 disabled:opacity-30 hover:bg-slate-200 text-slate-800"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
             </div>
-          ))
+          </div>
         )}
       </div>
 
-      {/* Create Modal */}
-      {isCreateModalOpen && (
-        <CreateComplaintModal
-          isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-          onCreated={() => {
-            setIsCreateModalOpen(false);
-            fetchComplaints();
-          }}
-        />
-      )}
+      {/* Modals */}
+      <CreateComplaintModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreated={fetchComplaints}
+      />
 
-      {/* Detail Modal */}
-      {selectedComplaint && (
-        <ComplaintDetailModal
-          isOpen={!!selectedComplaint}
-          complaint={selectedComplaint}
-          onClose={() => setSelectedComplaint(null)}
-          onUpdated={() => {
-            fetchComplaints();
-          }}
-        />
-      )}
+      <ComplaintDetailModal
+        isOpen={!!selectedComplaint}
+        complaint={selectedComplaint}
+        onClose={() => setSelectedComplaint(null)}
+        onUpdated={fetchComplaints}
+      />
     </div>
   );
 };

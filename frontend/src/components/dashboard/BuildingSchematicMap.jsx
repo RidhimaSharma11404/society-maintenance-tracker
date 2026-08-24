@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building, Wrench, X, AlertTriangle, ShieldCheck, Sparkles, Activity } from 'lucide-react';
+import { Building, Wrench, X, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 export const BuildingSchematicMap = ({
   riskClusters = [],
@@ -59,63 +59,69 @@ export const BuildingSchematicMap = ({
   const activeUnitInfo = selectedUnit ? getUnitStatus(selectedUnit) : null;
 
   return (
-    <div className="relative bg-[#0B1220]/90 border border-slate-800 p-6 sm:p-10 font-sans text-slate-100 rounded-3xl backdrop-blur-xl shadow-2xl">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-slate-800/80 pb-5 mb-7">
+    <div className="relative bg-white border border-[#CBD3DD] p-8 sm:p-12 font-sans text-[#16233D] shadow-sm">
+      {/* Signature Architectural Corner Drafting Marks */}
+      <span className="absolute -top-[1px] -left-[1px] w-3.5 h-3.5 border-t-2 border-l-2 border-[#16233D] pointer-events-none" />
+      <span className="absolute -top-[1px] -right-[1px] w-3.5 h-3.5 border-t-2 border-r-2 border-[#16233D] pointer-events-none" />
+      <span className="absolute -bottom-[1px] -left-[1px] w-3.5 h-3.5 border-b-2 border-l-2 border-[#16233D] pointer-events-none" />
+      <span className="absolute -bottom-[1px] -right-[1px] w-3.5 h-3.5 border-b-2 border-r-2 border-[#16233D] pointer-events-none" />
+
+      {/* Header with Human Voice */}
+      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-[#E4E8EE] pb-6 mb-8">
         <div>
           <div className="flex items-center gap-3">
-            <h2 className="text-base sm:text-lg font-bold font-sans tracking-tight text-white uppercase flex items-center gap-2">
-              <Activity className="w-5 h-5 text-cyan-400" />
+            <h2 className="text-base sm:text-lg font-bold font-sans tracking-tight text-[#16233D] uppercase">
               Greenwood Heights · Live Elevation
             </h2>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-mono border border-emerald-500/30 bg-emerald-950/50 text-emerald-400 rounded-full font-bold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-mono border border-[#CBD3DD] bg-[#F7F9FB] text-[#2E8B63] font-bold">
+              <span className="w-2 h-2 rounded-full bg-[#2E8B63]" />
               24 Units Monitored
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1.5">
-            Interactive digital twin. Tap any physical flat or core plant to inspect live telemetry and active work orders.
+          <p className="text-xs text-[#6E7C90] mt-1.5">
+            Tap a unit to see what's going on. Trouble spots pulse with real-time alert telemetry.
           </p>
         </div>
 
-        {/* Legend */}
-        <div className="flex items-center gap-4 text-xs font-sans">
+        {/* Minimal Decisive Legend */}
+        <div className="flex items-center gap-5 text-xs font-sans">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_10px_rgba(239,68,68,0.8)]" />
-            <span className="text-rose-400 font-bold">Critical Issue</span>
+            <span className="w-3 h-3 rounded-full bg-[#C6433D] shadow-[0_0_10px_rgba(198,67,61,0.7)]" />
+            <span className="text-[#16233D] font-bold">Critical Issue</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.8)]" />
-            <span className="text-amber-400 font-bold">High Alert</span>
+            <span className="w-3 h-3 rounded-full bg-[#E8891C] shadow-[0_0_10px_rgba(232,137,28,0.6)]" />
+            <span className="text-[#16233D] font-bold">High Alert</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-slate-700 border border-slate-600" />
-            <span className="text-slate-400">Nominal</span>
+            <span className="w-3 h-3 rounded-full bg-white border border-[#CBD3DD]" />
+            <span className="text-[#6E7C90]">Nominal</span>
           </div>
         </div>
       </div>
 
-      {/* ELEVATION LAYOUT */}
-      <div className="relative bg-[#070D18]/90 border border-slate-800/80 p-5 sm:p-8 rounded-2xl shadow-inner">
-        <div className="absolute inset-0 bg-[radial-gradient(#1e293b_1px,transparent_1px)] [background-size:20px_20px] opacity-30 pointer-events-none" />
+      {/* HERO LIVING BUILDING SILHOUETTE ELEVATION */}
+      <div className="relative bg-gradient-to-b from-[#F7F9FB] to-[#EEF2F6] border border-[#CBD3DD] p-6 sm:p-10 shadow-inner">
+        {/* Subtle Drafting Grid */}
+        <div className="absolute inset-0 bg-[radial-gradient(#CBD3DD_1px,transparent_1px)] [background-size:20px_20px] opacity-40 pointer-events-none" />
 
-        <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
-          {/* TOWER A */}
-          <div className="lg:col-span-4 bg-slate-900/90 backdrop-blur-md border border-slate-800/90 p-5 rounded-2xl space-y-3.5 shadow-lg">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+          {/* TOWER A (Residential Wing - 4 Cols) */}
+          <div className="lg:col-span-4 bg-white/95 backdrop-blur-xs border border-[#CBD3DD] p-5 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between border-b border-[#E4E8EE] pb-3">
               <div>
-                <span className="font-sans font-bold text-xs text-white uppercase tracking-wider block">
-                  Tower A (West Wing)
+                <span className="font-sans font-bold text-xs text-[#16233D] uppercase tracking-wider block">
+                  Tower A
                 </span>
-                <span className="text-[11px] font-mono text-cyan-400">Units 101 – 402</span>
+                <span className="text-[11px] font-mono text-[#6E7C90]">Units 101 – 402</span>
               </div>
-              <Building className="w-4 h-4 text-slate-400" />
+              <Building className="w-4 h-4 text-[#6E7C90]" />
             </div>
 
             <div className="space-y-2.5">
               {floors.map((fl) => (
                 <div key={fl.floor} className="flex items-center gap-2.5">
-                  <span className="w-12 text-[10px] font-mono text-slate-500 text-center font-bold">
+                  <span className="w-12 text-[10px] font-mono text-[#6E7C90] text-center font-bold">
                     {fl.label}
                   </span>
                   <div className="grid grid-cols-2 gap-2.5 flex-1">
@@ -130,16 +136,16 @@ export const BuildingSchematicMap = ({
                         <button
                           key={u}
                           onClick={() => onSelectUnit(isSelected ? null : u)}
-                          className={`living-unit p-3 text-left rounded-xl border cursor-pointer relative transition-all ${
+                          className={`living-unit p-3.5 text-left border cursor-pointer relative ${
                             isSelected
-                              ? 'ring-2 ring-cyan-400 bg-slate-800 border-cyan-400 z-30 shadow-[0_0_15px_rgba(6,182,212,0.4)]'
+                              ? 'ring-2 ring-[#16233D] bg-white z-30 shadow-md'
                               : isCritical
-                              ? 'bg-rose-950/80 text-white border-rose-500/80 glow-critical'
+                              ? 'bg-[#C6433D] text-white border-[#C6433D] glow-critical'
                               : isHigh
-                              ? 'bg-amber-950/80 text-white border-amber-500/80 glow-high font-semibold'
+                              ? 'bg-[#E8891C] text-white border-[#E8891C] glow-high font-semibold'
                               : isElevated
-                              ? 'bg-blue-950/60 text-cyan-200 border-blue-600/50'
-                              : 'bg-slate-950/80 hover:bg-slate-800 text-slate-200 border-slate-800/90'
+                              ? 'bg-[#16233D] text-white border-[#16233D]'
+                              : 'bg-white hover:bg-slate-50 text-[#16233D] border-[#CBD3DD]'
                           }`}
                         >
                           <div className="flex items-center justify-between">
@@ -147,15 +153,15 @@ export const BuildingSchematicMap = ({
                               {u.replace('Tower A - ', 'A-')}
                             </span>
                             {status.score > 0 && (
-                              <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
-                                isCritical ? 'bg-rose-500 text-white font-bold' : isHigh ? 'bg-amber-500 text-black font-bold' : 'bg-cyan-900 text-cyan-300'
+                              <span className={`text-[10px] font-mono px-1.5 py-0.2 ${
+                                isCritical || isHigh || isElevated ? 'bg-black/25 text-white' : 'bg-[#16233D] text-white'
                               }`}>
                                 {status.score}p
                               </span>
                             )}
                           </div>
-                          <div className={`text-[10px] font-sans mt-1 leading-tight whitespace-nowrap ${
-                            isCritical ? 'text-rose-200 font-medium' : isHigh ? 'text-amber-200 font-medium' : 'text-slate-400'
+                          <div className={`text-[9.5px] font-sans mt-1 leading-tight whitespace-nowrap ${
+                            isCritical || isHigh || isElevated ? 'text-white/95 font-medium' : 'text-[#6E7C90]'
                           }`}>
                             {status.count > 0 ? `${status.count} Active ${status.count === 1 ? 'Ticket' : 'Tickets'}` : 'Nominal'}
                           </div>
@@ -168,16 +174,16 @@ export const BuildingSchematicMap = ({
             </div>
           </div>
 
-          {/* CENTRAL UTILITY CORE */}
-          <div className="lg:col-span-4 bg-slate-900/90 backdrop-blur-md border border-slate-800/90 p-5 rounded-2xl space-y-3.5 shadow-lg">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          {/* CENTRAL CORE: Common Facilities & Shared Utilities (4 Cols) */}
+          <div className="lg:col-span-4 bg-white/95 backdrop-blur-xs border border-[#CBD3DD] p-5 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between border-b border-[#E4E8EE] pb-3">
               <div>
-                <span className="font-sans font-bold text-xs text-white uppercase tracking-wider block">
+                <span className="font-sans font-bold text-xs text-[#16233D] uppercase tracking-wider block">
                   Central Utility Core
                 </span>
-                <span className="text-[11px] font-mono text-cyan-400">Shared Campus Assets</span>
+                <span className="text-[11px] font-mono text-[#6E7C90]">Shared Campus Assets</span>
               </div>
-              <Wrench className="w-4 h-4 text-slate-400" />
+              <Wrench className="w-4 h-4 text-[#6E7C90]" />
             </div>
 
             <div className="space-y-2.5">
@@ -191,14 +197,14 @@ export const BuildingSchematicMap = ({
                   <button
                     key={plant.id}
                     onClick={() => onSelectUnit(isSelected ? null : plant.id)}
-                    className={`living-unit w-full p-3 text-left rounded-xl border cursor-pointer relative transition-all ${
+                    className={`living-unit w-full p-3.5 text-left border cursor-pointer relative ${
                       isSelected
-                        ? 'ring-2 ring-cyan-400 bg-slate-800 border-cyan-400 z-30 shadow-[0_0_15px_rgba(6,182,212,0.4)]'
+                        ? 'ring-2 ring-[#16233D] bg-white z-30 shadow-md'
                         : isCritical
-                        ? 'bg-rose-950/80 text-white border-rose-500/80 glow-critical'
+                        ? 'bg-[#C6433D] text-white border-[#C6433D] glow-critical'
                         : isHigh
-                        ? 'bg-amber-950/80 text-white border-amber-500/80 glow-high font-semibold'
-                        : 'bg-slate-950/80 hover:bg-slate-800 text-slate-200 border-slate-800/90'
+                        ? 'bg-[#E8891C] text-white border-[#E8891C] glow-high font-semibold'
+                        : 'bg-white hover:bg-slate-50 text-[#16233D] border-[#CBD3DD]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -206,19 +212,19 @@ export const BuildingSchematicMap = ({
                         {plant.label}
                       </span>
                       {status.score > 0 ? (
-                        <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
-                          isCritical ? 'bg-rose-500 text-white font-bold' : 'bg-amber-500 text-black font-bold'
+                        <span className={`text-[10px] font-mono px-1.5 py-0.2 ${
+                          isCritical || isHigh ? 'bg-black/25 text-white' : 'bg-[#16233D] text-white'
                         }`}>
                           {status.score} pts
                         </span>
                       ) : (
-                        <span className="text-[9px] font-mono text-emerald-400 bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                        <span className="text-[9px] font-mono text-[#2E8B63] bg-emerald-50 px-1.5 py-0.2 border border-emerald-200">
                           OK
                         </span>
                       )}
                     </div>
                     <div className={`text-[10px] font-sans mt-1 ${
-                      isCritical || isHigh ? 'text-slate-200' : 'text-slate-400'
+                      isCritical || isHigh ? 'text-white/95' : 'text-[#6E7C90]'
                     }`}>
                       {plant.sub}
                     </div>
@@ -228,22 +234,22 @@ export const BuildingSchematicMap = ({
             </div>
           </div>
 
-          {/* TOWER B */}
-          <div className="lg:col-span-4 bg-slate-900/90 backdrop-blur-md border border-slate-800/90 p-5 rounded-2xl space-y-3.5 shadow-lg">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          {/* TOWER B (Residential Wing - 4 Cols) */}
+          <div className="lg:col-span-4 bg-white/95 backdrop-blur-xs border border-[#CBD3DD] p-5 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between border-b border-[#E4E8EE] pb-3">
               <div>
-                <span className="font-sans font-bold text-xs text-white uppercase tracking-wider block">
-                  Tower B (East Wing)
+                <span className="font-sans font-bold text-xs text-[#16233D] uppercase tracking-wider block">
+                  Tower B
                 </span>
-                <span className="text-[11px] font-mono text-cyan-400">Units 101 – 402</span>
+                <span className="text-[11px] font-mono text-[#6E7C90]">Units 101 – 402</span>
               </div>
-              <Building className="w-4 h-4 text-slate-400" />
+              <Building className="w-4 h-4 text-[#6E7C90]" />
             </div>
 
             <div className="space-y-2.5">
               {floors.map((fl) => (
                 <div key={fl.floor} className="flex items-center gap-2.5">
-                  <span className="w-12 text-[10px] font-mono text-slate-500 text-center font-bold">
+                  <span className="w-12 text-[10px] font-mono text-[#6E7C90] text-center font-bold">
                     {fl.label}
                   </span>
                   <div className="grid grid-cols-2 gap-2.5 flex-1">
@@ -258,16 +264,16 @@ export const BuildingSchematicMap = ({
                         <button
                           key={u}
                           onClick={() => onSelectUnit(isSelected ? null : u)}
-                          className={`living-unit p-3 text-left rounded-xl border cursor-pointer relative transition-all ${
+                          className={`living-unit p-3.5 text-left border cursor-pointer relative ${
                             isSelected
-                              ? 'ring-2 ring-cyan-400 bg-slate-800 border-cyan-400 z-30 shadow-[0_0_15px_rgba(6,182,212,0.4)]'
+                              ? 'ring-2 ring-[#16233D] bg-white z-30 shadow-md'
                               : isCritical
-                              ? 'bg-rose-950/80 text-white border-rose-500/80 glow-critical'
+                              ? 'bg-[#C6433D] text-white border-[#C6433D] glow-critical'
                               : isHigh
-                              ? 'bg-amber-950/80 text-white border-amber-500/80 glow-high font-semibold'
+                              ? 'bg-[#E8891C] text-white border-[#E8891C] glow-high font-semibold'
                               : isElevated
-                              ? 'bg-blue-950/60 text-cyan-200 border-blue-600/50'
-                              : 'bg-slate-950/80 hover:bg-slate-800 text-slate-200 border-slate-800/90'
+                              ? 'bg-[#16233D] text-white border-[#16233D]'
+                              : 'bg-white hover:bg-slate-50 text-[#16233D] border-[#CBD3DD]'
                           }`}
                         >
                           <div className="flex items-center justify-between">
@@ -275,15 +281,15 @@ export const BuildingSchematicMap = ({
                               {u.replace('Tower B - ', 'B-')}
                             </span>
                             {status.score > 0 && (
-                              <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${
-                                isCritical ? 'bg-rose-500 text-white font-bold' : isHigh ? 'bg-amber-500 text-black font-bold' : 'bg-cyan-900 text-cyan-300'
+                              <span className={`text-[10px] font-mono px-1.5 py-0.2 ${
+                                isCritical || isHigh || isElevated ? 'bg-black/25 text-white' : 'bg-[#16233D] text-white'
                               }`}>
                                 {status.score}p
                               </span>
                             )}
                           </div>
-                          <div className={`text-[10px] font-sans mt-1 leading-tight whitespace-nowrap ${
-                            isCritical ? 'text-rose-200 font-medium' : isHigh ? 'text-amber-200 font-medium' : 'text-slate-400'
+                          <div className={`text-[9.5px] font-sans mt-1 leading-tight whitespace-nowrap ${
+                            isCritical || isHigh || isElevated ? 'text-white/95 font-medium' : 'text-[#6E7C90]'
                           }`}>
                             {status.count > 0 ? `${status.count} Active ${status.count === 1 ? 'Ticket' : 'Tickets'}` : 'Nominal'}
                           </div>
@@ -296,64 +302,53 @@ export const BuildingSchematicMap = ({
             </div>
           </div>
         </div>
+
+        {/* Foundation Plinth Base */}
+        <div className="mt-6 pt-4 border-t border-[#CBD3DD] flex items-center justify-between text-xs font-mono text-[#6E7C90]">
+          <span>FOUNDATION & BASEMENT PARKING · P1 / P2</span>
+          <span>CAMPUS POWER: 415V GRID STABLE</span>
+        </div>
       </div>
 
-      {/* SELECTED UNIT DRAWER / INSPECTOR */}
-      {selectedUnit && activeUnitInfo && (
-        <div className="mt-6 p-5 bg-slate-900/95 border border-cyan-500/40 rounded-2xl space-y-4 shadow-[0_0_20px_rgba(6,182,212,0.15)] animate-in fade-in">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-cyan-950 border border-cyan-500/40 flex items-center justify-center text-cyan-400 font-bold font-mono text-xs">
-                {selectedUnit.slice(0, 7)}
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-white">{selectedUnit}</h3>
-                <span className="text-xs text-slate-400">
-                  Risk Score: <strong className="text-cyan-400 font-mono">{activeUnitInfo.score} pts</strong> · Status:{' '}
-                  <strong className={activeUnitInfo.level === 'Critical' ? 'text-rose-400' : 'text-emerald-400'}>
-                    {activeUnitInfo.level}
-                  </strong>
+      {/* Selected Unit Telemetry Inspector Flyout */}
+      {selectedUnit && (
+        <div className="mt-6 p-5 bg-[#16233D] text-[#EEF2F6] border border-[#16233D] flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fadeIn shadow-md">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-[#E8891C] text-[#16233D] flex items-center justify-center font-bold text-xs flex-shrink-0">
+              UNIT
+            </div>
+            <div>
+              <div className="flex items-center gap-2.5">
+                <span className="font-mono font-bold text-base text-[#E8891C]">
+                  {selectedUnit.toUpperCase()}
+                </span>
+                <span className="text-[10px] font-mono px-2 py-0.5 bg-white/10 text-white border border-white/20">
+                  {activeUnitInfo?.level?.toUpperCase() || 'NOMINAL'}
                 </span>
               </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => onOpenCreateTicket && onOpenCreateTicket(selectedUnit)}
-                className="px-3 py-1.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs rounded-lg transition-all cursor-pointer shadow-sm"
-              >
-                + Dispatch Ticket for {selectedUnit}
-              </button>
-              <button
-                onClick={() => onSelectUnit(null)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              <p className="text-xs text-[#CBD3DD] mt-1">
+                {activeUnitInfo?.score > 0
+                  ? `${activeUnitInfo.count} active ticket(s) · Defect Severity Score: ${activeUnitInfo.score} pts`
+                  : 'Zero defect tickets logged for this unit. All facilities running normally.'}
+              </p>
             </div>
           </div>
 
-          {/* Ticket list for unit */}
-          {activeUnitInfo.complaints?.length > 0 ? (
-            <div className="space-y-2">
-              <p className="text-xs font-mono text-slate-400 uppercase tracking-wider">Active Work Orders for this Location:</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                {activeUnitInfo.complaints.map((c) => (
-                  <div key={c._id} className="p-3 bg-slate-950/80 border border-slate-800 rounded-xl space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-bold text-white truncate">{c.title}</span>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-blue-950 text-cyan-300 border border-cyan-500/30">
-                        {c.currentStatus}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 line-clamp-1">{c.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <p className="text-xs text-slate-400">No active complaints logged for this unit. All telemetry is nominal.</p>
-          )}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => onOpenCreateTicket && onOpenCreateTicket(selectedUnit)}
+              className="px-4 py-2 bg-[#E8891C] hover:bg-[#E8891C]/90 text-[#16233D] text-xs font-bold transition-colors cursor-pointer"
+            >
+              Report Issue for {selectedUnit}
+            </button>
+            <button
+              onClick={() => onSelectUnit(null)}
+              className="p-2 bg-white/10 hover:bg-white/20 text-[#EEF2F6] transition-colors cursor-pointer"
+              title="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       )}
     </div>
