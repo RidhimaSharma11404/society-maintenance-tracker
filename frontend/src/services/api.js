@@ -366,9 +366,13 @@ function handleMockRequest(url, method = 'get', body = {}) {
 
   // 5. RISK CLUSTERS
   if (cleanUrl.startsWith('/dashboard/risk-clusters') || cleanUrl.startsWith('/risk-analytics')) {
+    const clusters = computeRiskClusters(complaints, settings);
     return {
       success: true,
-      data: computeRiskClusters(complaints, settings)
+      data: {
+        clusters,
+        items: clusters
+      }
     };
   }
 
@@ -411,7 +415,14 @@ function handleMockRequest(url, method = 'get', body = {}) {
       }
     }
 
-    return { success: true, data: complaints };
+    return {
+      success: true,
+      data: {
+        items: complaints,
+        complaints: complaints,
+        total: complaints.length
+      }
+    };
   }
 
   // 7. NOTICES
@@ -430,7 +441,13 @@ function handleMockRequest(url, method = 'get', body = {}) {
       setStore('notices', notices);
       return { success: true, data: newNot };
     }
-    return { success: true, data: notices };
+    return {
+      success: true,
+      data: {
+        notices: notices,
+        items: notices
+      }
+    };
   }
 
   // 8. BILLING LEDGER
@@ -447,7 +464,19 @@ function handleMockRequest(url, method = 'get', body = {}) {
         return { success: true, data: targetBill };
       }
     }
-    return { success: true, data: billing };
+    return {
+      success: true,
+      data: {
+        invoices: billing,
+        items: billing,
+        summary: {
+          totalBilled: 22000,
+          totalCollected: 11000,
+          totalPending: 11000,
+          collectionRate: '50.0%'
+        }
+      }
+    };
   }
 
   // 9. TECHNICIANS & DISPATCH
@@ -459,22 +488,38 @@ function handleMockRequest(url, method = 'get', body = {}) {
         dispatchRef: `DSP-${Date.now()}`
       };
     }
-    return { success: true, data: technicians };
+    return {
+      success: true,
+      data: {
+        technicians: technicians,
+        items: technicians
+      }
+    };
   }
 
   // 10. SETTINGS
   if (cleanUrl.startsWith('/settings')) {
-    return { success: true, data: settings };
+    return {
+      success: true,
+      data: {
+        settings: settings,
+        items: settings
+      }
+    };
   }
 
   // 11. OUTBOX LOGS
   if (cleanUrl.startsWith('/outbox')) {
+    const outboxData = [
+      { _id: 'out_1', eventType: 'COMPLAINT_CREATED', recipient: 'admin@greenwood.com', channel: 'EMAIL', status: 'DELIVERED', createdAt: new Date(Date.now() - 10000).toISOString() },
+      { _id: 'out_2', eventType: 'SLA_ALERT', recipient: 'staff@greenwood.com', channel: 'SMS', status: 'DELIVERED', createdAt: new Date(Date.now() - 3600000).toISOString() }
+    ];
     return {
       success: true,
-      data: [
-        { _id: 'out_1', eventType: 'COMPLAINT_CREATED', recipient: 'admin@greenwood.com', channel: 'EMAIL', status: 'DELIVERED', createdAt: new Date(Date.now() - 10000).toISOString() },
-        { _id: 'out_2', eventType: 'SLA_ALERT', recipient: 'staff@greenwood.com', channel: 'SMS', status: 'DELIVERED', createdAt: new Date(Date.now() - 3600000).toISOString() }
-      ]
+      data: {
+        logs: outboxData,
+        items: outboxData
+      }
     };
   }
 
