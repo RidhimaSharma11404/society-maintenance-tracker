@@ -1,0 +1,28 @@
+{
+  "name": "greenwood-heights-ops-platform",
+  "version": "1.0.0",
+  "description": "Greenwood Heights Co-operative Housing Society Operations & Predictive Maintenance Platform",
+  "main": "backend/src/server.js",
+  "scripts": {
+    "build": "npm --prefix frontend install && npm --prefix frontend run build && npm --prefix backend install",
+    "start": "node backend/src/server.js",
+    "test": "npm --prefix backend test",
+    "seed": "node backend/src/scripts/seed.js"
+  },
+  "keywords": [
+    "facility-management",
+    "smart-building",
+    "society-maintenance",
+    "predictive-maintenance",
+    "fsm",
+    "telemetry",
+    "react",
+    "express",
+    "mongodb"
+  ],
+  "author": "Greenwood Heights Operations Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
