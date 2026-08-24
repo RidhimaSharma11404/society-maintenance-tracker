@@ -292,20 +292,18 @@ function handleMockRequest(url, method = 'get', body = {}) {
   // 1. AUTH LOGIN
   if (cleanUrl.startsWith('/auth/login')) {
     const { email, password } = body;
-    const foundUser = users.find(u => u.email.toLowerCase() === (email || '').toLowerCase());
-    if (foundUser && (password === 'Password123!' || password === foundUser.password || password?.length >= 6)) {
-      return {
-        success: true,
-        user: foundUser,
-        token: `jwt_${foundUser._id}_${Date.now()}`
-      };
-    }
-    // Default fallback to first matching role or Admin
-    const roleUser = users.find(u => (email || '').toLowerCase().includes(u.role)) || users[0];
+    const foundUser = users.find(u => u.email.toLowerCase() === (email || '').toLowerCase()) ||
+                      users.find(u => (email || '').toLowerCase().includes(u.role)) ||
+                      users[0];
+    const tokenStr = `jwt_${foundUser._id}_${Date.now()}`;
     return {
       success: true,
-      user: roleUser,
-      token: `jwt_${roleUser._id}_${Date.now()}`
+      data: {
+        user: foundUser,
+        token: tokenStr
+      },
+      user: foundUser,
+      token: tokenStr
     };
   }
 
@@ -322,19 +320,26 @@ function handleMockRequest(url, method = 'get', body = {}) {
     };
     users.push(newUser);
     setStore('users', users);
+    const tokenStr = `jwt_${newUser._id}_${Date.now()}`;
     return {
       success: true,
+      data: {
+        user: newUser,
+        token: tokenStr
+      },
       user: newUser,
-      token: `jwt_${newUser._id}_${Date.now()}`
+      token: tokenStr
     };
   }
 
   // 3. AUTH ME
   if (cleanUrl.startsWith('/auth/me')) {
     const savedUser = JSON.parse(localStorage.getItem('society_auth_user') || 'null');
+    const u = savedUser || users[0];
     return {
       success: true,
-      user: savedUser || users[0]
+      data: { user: u },
+      user: u
     };
   }
 
